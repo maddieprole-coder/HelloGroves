@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Virtual kitchen</title>
+<style>
+:root{--g:#2F5D50;--g2:#e8f0ec;--ink:#1d1d1b;--mut:#666;--line:#d9d9d4;--warn:#b24a2b;--bg:#fafaf7}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:var(--bg);font-size:15px}
+header{background:var(--g);color:#fff;padding:14px 18px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+header h1{font-size:18px;margin:0}
+nav button{background:none;border:1px solid rgba(255,255,255,.6);color:#fff;padding:7px 12px;border-radius:6px;cursor:pointer;margin-left:4px;font:inherit}
+nav button.on{background:#fff;color:var(--g)}
+main{padding:18px;max-width:980px;margin:0 auto}
+h2{font-size:17px;margin:0 0 10px}
+.card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:14px}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:12px;color:var(--mut);font-weight:600;text-transform:uppercase}
+input,select,textarea{font:inherit;padding:6px 8px;border:1px solid #bbb;border-radius:5px;background:#fff}
+textarea{width:100%;min-height:100px}
+button.b{background:var(--g);color:#fff;border:0;padding:8px 14px;border-radius:5px;cursor:pointer;font:inherit}
+button.s{background:#fff;border:1px solid #bbb;padding:3px 9px;border-radius:5px;cursor:pointer;font:inherit}
+button.d{background:none;border:0;color:var(--warn);cursor:pointer;font:inherit;padding:0}
+.low{color:var(--warn);font-weight:bold}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.muted{color:var(--mut);font-size:13px}
+.ok{color:var(--g);font-weight:bold}
+.big{font-size:22px;font-weight:bold;color:var(--g)}
+.note{font-size:12px;color:var(--mut)}
+/* minimalist refresh */
+:root{--g:#2F5D50;--ink:#1a1a18;--mut:#7a7a74;--line:#ecebe6;--bg:#fbfbf9;--warn:#b5532f}
+body{background:var(--bg);-webkit-font-smoothing:antialiased;font-size:14.5px}
+header{background:#fff;color:var(--ink);border-bottom:1px solid var(--line);padding:16px 24px;position:sticky;top:0;z-index:5}
+header h1{font-size:15px;font-weight:600;letter-spacing:.02em}
+#status{color:var(--mut)!important;opacity:1!important}
+nav button{background:none;border:0;color:var(--mut);padding:6px 12px;margin-left:2px;border-radius:999px;font-size:14px}
+nav button:hover{color:var(--ink)}
+nav button.on{background:var(--ink);color:#fff}
+main{max-width:1040px;padding:28px 24px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px}
+h2{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin:0 0 16px}
+th{font-size:11px;color:var(--mut);font-weight:500;border-bottom:1px solid var(--line);padding:10px 8px}
+td{padding:12px 8px;border-bottom:1px solid #f3f2ee}
+tr:last-child td{border-bottom:0}
+input,select,textarea{border:1px solid var(--line);border-radius:999px;padding:8px 14px;background:#fff;font-size:14px;outline:none;color:var(--ink)}
+textarea{border-radius:12px}
+input:focus,select:focus,textarea:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(47,93,80,.12)}
+button.b{background:var(--ink);color:#fff;border:0;border-radius:999px;padding:9px 18px;font-size:14px;cursor:pointer}
+button.b:hover{background:var(--g)}
+button.s{background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 11px;color:var(--ink);cursor:pointer;font-size:13px}
+button.s:hover{border-color:#cfcec8}
+button.d{background:none;border:0;color:var(--mut);cursor:pointer;font-size:13px;padding:0}
+button.d:hover{color:var(--warn)}
+.low{color:var(--warn);font-weight:500}
+.note{font-size:12.5px;color:var(--mut);line-height:1.5}
+.muted{color:var(--mut)}
+.big{font-weight:600}
+.row{gap:10px}
+.ok{color:var(--g);font-weight:500}
+@media (max-width:640px){
+  header{flex-direction:column;align-items:stretch;padding:12px 14px;gap:8px}
+  nav{display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+  nav button{flex:0 0 auto;margin-left:0;padding:6px 11px}
+  #status{font-size:12px}
+  main{padding:16px 12px}
+  .card{padding:16px 14px;border-radius:12px;overflow-x:auto}
+  table{font-size:13px}
+  th,td{padding:9px 6px}
+  h2{margin-bottom:12px}
+  .row{flex-direction:column;align-items:stretch;gap:8px}
+  .row input,.row select,.row button.b{width:100%!important;max-width:100%}
+  .row button.s{align-self:flex-start}
+  input,select,textarea{font-size:16px}
+  .shop table,.shop tbody{display:block}
+  .shop thead{display:none}
+  .shop tr{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;padding:14px 0;border-bottom:1px solid var(--line)}
+  .shop tr:last-child{border-bottom:0}
+  .shop td{border:0;padding:0;font-size:14px}
+  .shop td:first-child{grid-column:1/-1;font-weight:600;font-size:15px}
+  .shop td[colspan]{grid-column:1/-1}
+  .shop td:nth-child(6) input{width:100%!important}
+  .shop td:nth-child(7) .note{display:none}
+  .shop tr.sec{display:block;padding:16px 0 4px;border-bottom:1px solid var(--line)}
+}
+/* section headings */
+tr.sec td{border-bottom:1px solid var(--line);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);padding:18px 8px 6px;font-weight:600}
+/* aesthetic pass */
+:root{--bg:#f7f5f0;--g:#3f6b5a;--ink:#23231f;--mut:#8a867c;--line:#e7e3d9;--sage:#7d9a86}
+body{background:var(--bg)}
+header{background:linear-gradient(180deg,#ffffff,#fbf9f4);box-shadow:0 1px 0 var(--line)}
+header h1{font-family:Georgia,"Times New Roman",serif;font-size:21px;font-weight:500;letter-spacing:0}
+nav button{transition:background .15s,color .15s}
+nav button.on{background:var(--g)}
+h2{font-family:Georgia,"Times New Roman",serif;font-size:20px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--ink);margin-bottom:14px}
+.card{border-radius:18px;box-shadow:0 1px 3px rgba(40,35,20,.04),0 8px 24px -14px rgba(40,35,20,.10);transition:box-shadow .2s}
+.card:hover{box-shadow:0 2px 6px rgba(40,35,20,.05),0 14px 30px -14px rgba(40,35,20,.14)}
+th{letter-spacing:.06em}
+tbody tr:hover td{background:#fbfaf6}
+button.b{background:var(--g);box-shadow:0 6px 14px -6px rgba(63,107,90,.55);transition:background .15s}
+button.b:hover{background:#34594b}
+.note{font-style:italic;line-height:1.6}
+tr.sec td{color:var(--sage);letter-spacing:.14em}
+.low{color:#a4482a}
+</style>
+</head>
+<body>
+<header>
+  <h1>Virtual kitchen</h1>
+  <nav>
+    <button data-tab="stock" class="on">Stock</button>
+    <button data-tab="house">Household</button>
+    <button data-tab="recipes">Recipes</button>
+    <button data-tab="plan">Plan</button>
+    <button data-tab="shop">Shopping list</button>
+    <button data-tab="budget">Budget</button>
+  </nav>
+  <div class="note" id="status" style="color:#fff;opacity:.85">Loading…</div>
+</header>
+<main><div id="view"></div></main>
+
+<script>
+const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const uid0=()=>Math.random().toString(36).slice(2,9);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const gbp=n=>"£"+(Number(n)||0).toFixed(2);
+const norm=s=>String(s??"").trim().toLowerCase();
+const val=id=>document.getElementById(id).value;
+const stepFor=unit=>/^(g|ml)$/i.test(unit)?100:1;
+
+const SEED={
+  stock:[
+    {id:uid0(),name:"Olive oil",qty:1,unit:"bottle",low:1},
+    {id:uid0(),name:"Rice",qty:500,unit:"g",low:250},
+    {id:uid0(),name:"Tinned tomatoes",qty:2,unit:"tin",low:2},
+    {id:uid0(),name:"Peppers",qty:1,unit:"each",low:2}
+  ],
+  recipes:[
+    {id:uid0(),name:"Chicken fajitas",servings:4,cost:14.5,prep:15,cook:20,ingredients:[
+      {name:"Chicken thigh",qty:600,unit:"g"},{name:"Peppers",qty:3,unit:"each"},
+      {name:"Onion",qty:1,unit:"each"},{name:"Tortillas",qty:8,unit:"each"}]},
+    {id:uid0(),name:"Lentil dhal",servings:4,cost:6.2,prep:10,cook:30,ingredients:[
+      {name:"Red lentils",qty:250,unit:"g"},{name:"Tinned tomatoes",qty:1,unit:"tin"},
+      {name:"Rice",qty:300,unit:"g"},{name:"Spinach",qty:200,unit:"g"}]}
+  ],
+  plan:{},
+  box:{cost:68,people:4,meals:5},
+  target:{low:40,high:50},
+  discount:10
+};
+
+let S=JSON.parse(JSON.stringify(SEED));
+let tab="stock", ref=null, timer=null, status="Loading…";
+
+async function connect(){
+  try{
+    const db=window.claude?await window.claude.use("db"):null;
+    const user=window.claude?await window.claude.use("user"):null;
+    if(db&&user){ const id=await user.id(); ref=db.doc("data/users/"+id+"/kitchen"); }
+  }catch(e){ ref=null; }
+  if(ref){
+    try{
+      const snap=await ref.get();
+      const d=snap&&(typeof snap.data==="function"?snap.data():snap.data);
+      if(d&&d.stock){ S=JSON.parse(JSON.stringify(d)); status="Saved to your account"; }
+      else { await ref.set(S); status="Saved to your account"; }
+    }catch(e){ ref=null; }
+  }
+  if(!ref){
+    try{ const raw=localStorage.getItem("kitchen"); if(raw) S=JSON.parse(raw); }catch(e){}
+    status="Saved in this browser only";
+  }
+  render();
+  addMissingStarters();
+  render();
+}
+
+const INITIAL_STOCK=[["dried thyme",1,"tsp"],["dried oregano",1,"tsp"],["dried rosemary",0.75,"g"],["5 spice mix",1,"tsp"],["smoked paprika",2,"tsp"],["cinnamon",0.5,"g"],["cornflour",4,"tbsp"],["caribbean jerk seasoning",5,"g"],["thai style spice mix",14,"g"],["indonesian style spice mix",3.5,"g"],["breadcrumbs",75,"g"],["sriracha",15,"ml"],["apple cider vinegar",30,"ml"],["red wine vinegar",24,"ml"],["white wine vinegar",15,"ml"],["balsamic glaze",24,"g"],["sesame oil",40,"ml"],["chinese rice wine",30,"ml"],["ketjap manis",20,"g"],["soy sauce",10,"ml"],["guinness smoky bbq sauce",1,"each"],["tomato puree",30,"g"],["ginger puree",1,"each"],["miso paste",15,"g"],["vegetable stock paste",15,"g"],["red chilli relish",25,"g"],["honey",60,"g"],["chicken stock cube",12,"each"],["beef stock cube",12,"each"]];
+const INITIAL_STOCK2=[["chicken seasoning",3,"each"],["jerk seasoning",1,"each"],["green seasoning",1,"each"],["all purpose seasoning",100,"g"],["garlic granules",2,"each"],["fajita seasoning",1,"each"],["salt and pepper seasoning",1,"each"],["paprika",1,"each"],["dried thyme",1,"each"],["italian seasoning",1,"each"],["rosemary",3,"each"],["herbes de provence",1,"each"],["chilli and garlic seasoning",1,"each"],["mixed spice",1,"each"],["ground cinnamon",1,"each"],["pink himalayan salt",1,"each"],["bicarbonate of soda",1,"each"],["sweetcorn",1,"tin"],["hot honey",1,"each"]];
+function seedBatch2(){
+  if(S.pantrySeeded2) return;
+  S.stock=S.stock||[];
+  INITIAL_STOCK2.forEach(([name,qty,unit])=>{
+    if(!S.stock.some(s=>normN(s.name)===normN(name)&&normU(s.unit)===normU(unit))) S.stock.push({id:uid0(),name,qty,unit,low:0});
+  });
+  S.pantrySeeded2=true;
+}
+const INITIAL_STOCK3=[["crispy onions",30,"g"]];
+function seedBatch3(){
+  if(S.pantrySeeded3) return;
+  S.stock=S.stock||[];
+  INITIAL_STOCK3.forEach(([name,qty,unit])=>{
+    if(!S.stock.some(s=>normN(s.name)===normN(name)&&normU(s.unit)===normU(unit))) S.stock.push({id:uid0(),name,qty,unit,low:0});
+  });
+  S.pantrySeeded3=true;
+}
+const INITIAL_STOCK4=[["beef and pork mince",750,"g"],["chicken thighs",650,"g"],["lamb mince",500,"g"],["sausage meat",450,"g"],["beef mince",500,"g"]];
+function seedBatch4(){
+  if(S.pantrySeeded4) return;
+  S.stock=S.stock||[];
+  INITIAL_STOCK4.forEach(([name,qty,unit])=>{
+    if(!S.stock.some(s=>normN(s.name)===normN(name)&&normU(s.unit)===normU(unit))) S.stock.push({id:uid0(),name,qty,unit,low:0});
+  });
+  S.pantrySeeded4=true;
+}
+function fixLambMince(){
+  if(S.lambFixed) return;
+  const s=(S.stock||[]).find(x=>normN(x.name)==="lamb mince");
+  if(s) s.qty=500;
+  S.lambFixed=true;
+}
+const WEEKLY5=[["unsmoked back bacon","pack",1,"Breakfast (weekend)"],["black pudding","each",1,"Breakfast (weekend)"]];
+function seedBatch5(){
+  if(S.pantrySeeded5) return;
+  S.stock=S.stock||[];
+  WEEKLY5.forEach(([name,unit,need,cat])=>{
+    if(!S.stock.some(s=>normN(s.name)===normN(name)&&normU(s.unit)===normU(unit))) S.stock.push({id:uid0(),name,unit,qty:0,low:0,cat,need});
+  });
+  S.pantrySeeded5=true;
+}
+const WEEKLY6=[["cereal","bag",1],["porridge oats","g",400],["greek yoghurt","tub",1],["chocolate chips","g",200],["banana","each",5]];
+function seedBatch6(){
+  if(S.pantrySeeded6) return;
+  S.stock=S.stock||[];
+  WEEKLY6.forEach(([name,unit,need])=>{
+    if(!S.stock.some(s=>normN(s.name)===normN(name)&&normU(s.unit)===normU(unit))) S.stock.push({id:uid0(),name,unit,qty:0,low:0,cat:"Breakfast (weekday)",need});
+  });
+  S.pantrySeeded6=true;
+}
+function fixWeekly2(){
+  if(S.weeklyFixed2) return;
+  S.stock=S.stock||[];
+  const set=(name,patch)=>{ const s=S.stock.find(x=>normN(x.name)===name); if(s) Object.assign(s,patch); };
+  set("cereal",{unit:"bag",qty:1,need:1});
+  set("greek yoghurt",{unit:"tub",qty:1,need:1});
+  set("porridge oats",{qty:1000,need:400});
+  if(!S.stock.some(x=>normN(x.name)==="uht milk")) S.stock.push({id:uid0(),name:"UHT milk",unit:"box",qty:2,low:0,cat:"Household",need:0});
+  S.weeklyFixed2=true;
+}
+const WEEKLY7=[["pop","can",28]];
+function seedBatch7(){
+  if(S.pantrySeeded7) return;
+  S.stock=S.stock||[];
+  WEEKLY7.forEach(([name,unit,need])=>{
+    if(!S.stock.some(s=>normN(s.name)===normN(name)&&normU(s.unit)===normU(unit))) S.stock.push({id:uid0(),name,unit,qty:0,low:0,cat:"Drinks",need});
+  });
+  S.pantrySeeded7=true;
+}
+function fixPop(){
+  if(S.popFixed) return;
+  const s=(S.stock||[]).find(x=>normN(x.name)==="pop");
+  if(s) s.need=24;
+  S.popFixed=true;
+}
+function fixWeekly3(){
+  if(S.weeklyFixed3) return;
+  const s=(S.stock||[]).find(x=>normN(x.name)==="greek yoghurt");
+  if(s) Object.assign(s,{unit:"g",qty:500,need:500});
+  S.weeklyFixed3=true;
+}
+function seedPantry(){
+  seedBatch2();
+  seedBatch3();
+  seedBatch4();
+  seedBatch5();
+  seedBatch6();
+  fixWeekly2();
+  fixWeekly3();
+  seedBatch7();
+  fixPop();
+  purgeSideSalad();
+  fixLambMince();
+  if(S.pantrySeeded) return;
+  S.stock=S.stock||[];
+  INITIAL_STOCK.forEach(([name,qty,unit])=>{
+    if(!S.stock.some(s=>normN(s.name)===normN(name)&&normU(s.unit)===normU(unit))) S.stock.push({id:uid0(),name,qty,unit,low:0});
+  });
+  S.pantrySeeded=true;
+}
+function addMissingStarters(){
+  seedPantry();
+  try{
+    if(!Array.isArray(S.recipes)) S.recipes=[];
+    const BANNED=/courgette|zucchini|green bean/i;
+    const before=S.recipes.length;
+    S.recipes=S.recipes.filter(r=>!BANNED.test(r.name||"")&&!(r.ingredients||[]).some(i=>BANNED.test(i.name||"")));
+    const removed=before-S.recipes.length;
+    let bf=0;
+    S.recipes.forEach(r=>{ if((!r.steps||r.stepsV!==2)&&METHODS[r.name]){ r.steps=METHODS[r.name]; r.stepsV=2; bf++; } });
+    Object.keys(S.plan).forEach(d=>{ if(S.plan[d]&&!S.recipes.some(r=>r.id===S.plan[d].recipeId)) delete S.plan[d]; });
+    let n=0;
+    STARTER.forEach(x=>{
+      if(!S.recipes.some(r=>norm(r.name)===norm(x.name))){
+        S.recipes.push({...x,id:uid0(),steps:METHODS[x.name]||[],stepsV:2,ingredients:x.ingredients.map(i=>({...i}))}); n++;
+      }
+    });
+    if(n||removed||bf){ status=(n?`Loaded ${n} recipes. `:"")+(removed?`Removed ${removed} with courgette or green beans.`:""); save(); }
+    return n;
+  }catch(e){
+    status="Starter load failed: "+(e&&e.message?e.message:String(e));
+    paintStatus();
+    return 0;
+  }
+}
+
+function save(){
+  clearTimeout(timer);
+  timer=setTimeout(async()=>{
+    try{
+      if(ref){ await ref.set(S); status="Saved "+new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}); }
+      else { localStorage.setItem("kitchen",JSON.stringify(S)); status="Saved in this browser only"; }
+    }catch(e){
+      status="Couldn't save: "+(e&&e.message?e.message:"unknown error");
+    }
+    paintStatus();
+  },300);
+}
+function note(msg){ status=msg; paintStatus(); }
+
+function backFor(s){ const b=bandFor(s.name,1,s.unit); return (b&&normU(b.unitName)===normU(s.unit))?b.pack:1; }
+function purgeSideSalad(){
+  const bad=/side salad/i;
+  (S.recipes||[]).forEach(r=>{
+    r.ingredients=(r.ingredients||[]).filter(i=>!bad.test(i.name));
+    if(Array.isArray(r.steps)) r.steps=r.steps.filter(x=>!bad.test(x));
+  });
+  S.stock=(S.stock||[]).filter(s=>!bad.test(s.name));
+}
+function normaliseIngredients(){
+  const isPep=n=>/pepper/i.test(n)&&!/salt|black|white|chilli|paprika|sichuan|cayenne/i.test(n);
+  (S.recipes||[]).forEach(r=>{
+    (r.ingredients||[]).forEach(i=>{
+      if(isPep(i.name)) i.name="Bell pepper";
+      if(/garlic/i.test(i.name)&&!/granule/i.test(i.name)){
+        const u=String(i.unit||"").toLowerCase();
+        if(u==="clove"||u==="each"||u===""){ i.qty=+((Number(i.qty)||1)*2).toFixed(1); i.unit="g"; }
+        i.name="garlic granules";
+      }
+      if(/granule/i.test(i.name)&&String(i.unit||"").toLowerCase()==="tsp"){ i.qty=+(Number(i.qty)*4).toFixed(1); i.unit="g"; }
+    });
+    if(Array.isArray(r.steps)) r.steps=r.steps.map(x=>x.replace(/\bgarlic\b(?! granules)/gi,"garlic granules"));
+  });
+  (S.stock||[]).forEach(s=>{ if(isPep(s.name)) s.name="Bell pepper"; });
+  if(!S.granulesFixed){
+    (S.stock||[]).forEach(s=>{ if(normN(s.name)==="garlic granules"){ s.unit="tsp"; s.qty=40; } });
+    S.granulesFixed=true;
+  }
+  if(!S.granulesFixed2){
+    (S.stock||[]).forEach(s=>{ if(normN(s.name)==="garlic granules"){ s.unit="g"; s.qty=112; } });
+    S.granulesFixed2=true;
+  }
+}
+function shopping(){
+  purgeSideSalad();
+  normaliseIngredients();
+  const need={};
+  DAYS.forEach(d=>{
+    const p=S.plan[d]; if(!p||!p.recipeId||p.cooked) return;
+    const r=S.recipes.find(x=>x.id===p.recipeId); if(!r) return;
+    r.ingredients.forEach(i=>{
+      const k=norm(i.name)+"|"+norm(i.unit);
+      need[k]=need[k]||{name:i.name,unit:i.unit,qty:0};
+      need[k].qty+=Number(i.qty)||0;
+    });
+  });
+  S.stock.forEach(s=>{
+    const lowAt=s.low>0?s.low:(portionFor(s)||s.need||0);
+    const back=s.qty<=lowAt?backFor(s):0;
+    const add=(Number(s.need)||0)+back; if(!add) return;
+    const k=norm(s.name)+"|"+norm(s.unit); need[k]=need[k]||{name:s.name,unit:s.unit,qty:0}; need[k].qty+=add;
+  });
+  return Object.values(need).map(n=>{
+    const have=S.stock.filter(s=>norm(s.name)===norm(n.name)&&norm(s.unit)===norm(n.unit)).reduce((a,s)=>a+s.qty,0);
+    return {...n,have,buy:Math.max(0,n.qty-have)};
+  }).filter(x=>x.buy>0);
+}
+
+function cook(d){
+  const p=S.plan[d]; const r=p&&S.recipes.find(x=>x.id===p.recipeId); if(!r) return;
+  r.ingredients.forEach(i=>{
+    let rem=Number(i.qty)||0;
+    S.stock.filter(s=>norm(s.name)===norm(i.name)&&norm(s.unit)===norm(i.unit)).forEach(s=>{
+      const t=Math.min(rem,s.qty); s.qty=+(s.qty-t).toFixed(2); rem-=t;
+    });
+  });
+  p.cooked=true;
+  S.history=S.history||[];
+  S.history.push({date:new Date().toISOString().slice(0,10),recipeId:r.id,name:r.name});
+}
+
+function ingredientOptions(){
+  const seen={};
+  S.recipes.forEach(r=>r.ingredients.forEach(i=>{ const k=normN(i.name)+"|"+normU(i.unit); if(!seen[k]) seen[k]={name:i.name,unit:i.unit}; }));
+  return Object.values(seen).sort((a,b)=>a.name.localeCompare(b.name)).map(x=>`<option value="${esc(x.name)}" data-unit="${esc(x.unit)}">${esc(x.name)} (${esc(x.unit)})</option>`).join("");
+}
+const HOUSE_CATS=["Breakfast (weekday)","Breakfast (weekend)","Fruit","Sweet treats","Toiletries","Drinks","Household"];
+function vHouse(){
+  const items=S.stock.filter(s=>s.cat);
+  const rows=HOUSE_CATS.map(c=>items.filter(s=>s.cat===c).map(s=>{
+    const lowAt=s.low>0?s.low:(s.need||0);
+    const isLow=s.qty<=lowAt;
+    return `<tr><td>${esc(c)}</td><td>${esc(s.name)}</td><td>${s.need||0} ${esc(s.unit)} a week</td><td class="${isLow?'low':''}">${s.qty} ${esc(s.unit)}${isLow?' · low':''}</td><td><button class="s" data-a="stock-dec" data-id="${s.id}">−</button> <button class="s" data-a="stock-inc" data-id="${s.id}">+</button></td><td><button class="d" data-a="stock-del" data-id="${s.id}">Remove</button></td></tr>`;
+  }).join("")).join("");
+  return `<div class="card"><h2>Household</h2>
+    <p class="note">Breakfasts, fruit, sweet treats and toiletries. Set a weekly need and the shopping list buys whatever is short of it.</p>
+    <table><thead><tr><th>Section</th><th>Item</th><th>Weekly need</th><th>In stock</th><th>Adjust</th><th></th></tr></thead>
+    <tbody>${rows||'<tr><td colspan="6" class="muted">Nothing here yet.</td></tr>'}</tbody></table></div>
+    <div class="card"><h2>Add item</h2>
+    <div class="row">
+      <select id="hc">${HOUSE_CATS.map(c=>`<option>${esc(c)}</option>`).join("")}</select>
+      <input id="hn" placeholder="Item name" size="20">
+      <input id="hu" placeholder="Unit (g, each, pack)" style="width:150px">
+      <input id="hw" type="number" min="0" step="any" placeholder="Weekly need" style="width:110px">
+      <input id="hq" type="number" min="0" step="any" placeholder="In stock" style="width:100px">
+      <input id="hl" type="number" min="0" step="any" placeholder="Low at" style="width:90px">
+      <button class="b" data-a="house-add">Add</button>
+    </div></div>`;
+}
+function portionFor(s){
+  let m=0;
+  S.recipes.forEach(r=>r.ingredients.forEach(i=>{ if(normN(i.name)===normN(s.name)&&normU(i.unit)===normU(s.unit)) m=Math.max(m,Number(i.qty)||0); }));
+  return m;
+}
+function vStock(){
+  const rows=S.stock.map(s=>{
+    const lowAt=s.low>0?s.low:(portionFor(s)||s.need||0);
+    const isLow=s.qty<=lowAt;
+    return `<tr>
+      <td>${esc(s.name)}</td>
+      <td class="${isLow?'low':''}">${s.qty} ${esc(s.unit)}${isLow?' · low':''}</td>
+      <td class="muted">low at ${lowAt}</td>
+      <td><button class="s" data-a="stock-dec" data-id="${s.id}">−</button> <button class="s" data-a="stock-inc" data-id="${s.id}">+</button></td>
+      <td><button class="d" data-a="stock-del" data-id="${s.id}">Remove</button></td></tr>`;
+  }).join("");
+  return `<div class="card"><h2>Stock</h2>
+    <table><thead><tr><th>Item</th><th>In stock</th><th></th><th>Adjust</th><th></th></tr></thead>
+    <tbody>${rows||'<tr><td colspan="5" class="muted">Nothing in stock yet.</td></tr>'}</tbody></table>
+    <p class="note">+/− moves by 100 for g and ml, otherwise by 1. Items are matched to recipes by name and unit, so keep them consistent. An item turns low when it reaches one 4-person portion, unless you set a Low at figure.</p></div>
+    <div class="card"><h2>Add stock</h2>
+    <div class="row">
+      <input id="sn" list="ingr" placeholder="Search or type an item" size="24">
+      <datalist id="ingr">${ingredientOptions()}</datalist>
+      <input id="sq" type="number" min="0" step="any" placeholder="Qty" style="width:90px">
+      <input id="su" placeholder="Unit (g, each, tin)" style="width:150px">
+      <input id="sl" type="number" min="0" step="any" placeholder="Low at" style="width:90px">
+      <button class="b" data-a="stock-add">Add</button>
+    </div></div>`;
+}
+
+function vRecipes(){
+  const cards=S.recipes.map(r=>{
+    const per=r.servings>0?r.cost/r.servings:0;
+    return `<div class="card">
+      <div class="row" style="justify-content:space-between"><strong>${esc(r.name)}</strong>
+        <button class="d" data-a="rec-del" data-id="${r.id}">Remove</button></div>
+      <div class="muted">${r.servings} servings · ${r.prep+r.cook} min · ${gbp(r.cost)} total (${gbp(per)} each)</div>
+      <div class="note">${esc(r.method||'')}${r.carb?' · '+esc(r.carb):''}${r.nut?' · '+esc(r.nut):''}</div>
+      <ul style="padding-left:18px;margin:8px 0">${r.ingredients.map(i=>`<li>${esc(i.name)}: ${i.qty} ${esc(i.unit)}</li>`).join("")}</ul>
+    </div>`;
+  }).join("");
+  return `<div class="grid">${cards||'<div class="muted">No recipes yet.</div>'}</div>
+    <div class="card" style="margin-top:14px"><h2>Starter recipes</h2><p class="note">Over 100 original dinners for four, all 25 minutes or less, no oven: airfryer or hob only. Pasta, potatoes, rice and bread, mostly meat or fish. Adds only the ones you don't already have. Costs are rough estimates, so edit them to your own prices.</p><button class="b" data-a="rec-starter">Add starter recipes</button></div>
+    <div class="card"><h2>Add a recipe</h2>
+    <div class="row">
+      <input id="rn" placeholder="Recipe name" size="24">
+      <input id="rs" type="number" min="1" value="4" style="width:90px" title="Servings">
+      <input id="rc" type="number" min="0" step="0.01" placeholder="Cost £" style="width:110px">
+      <input id="rp" type="number" min="0" placeholder="Prep min" style="width:100px">
+      <input id="rk" type="number" min="0" placeholder="Cook min" style="width:100px">
+    </div>
+    <p class="note">Ingredients, one per line as: name, quantity, unit (for example: Rice, 300, g)</p>
+    <textarea id="ri"></textarea>
+    <p><button class="b" data-a="rec-add">Save recipe</button></p></div>`;
+}
+
+function vPlan(){
+  const opts=id=>`<option value="">— nothing —</option>`+S.recipes.map(r=>`<option value="${r.id}"${r.id===id?' selected':''}>${esc(r.name)}</option>`).join("");
+  const rows=DAYS.map(d=>{
+    const p=S.plan[d]||{};
+    const r=S.recipes.find(x=>x.id===p.recipeId);
+    const action=!r?'':(p.cooked?'<span class="ok">Cooked, stock updated</span>':`<button class="s" data-a="plan-cook" data-day="${d}">Cook → use stock</button>`);
+    return `<tr><td><strong>${d}</strong></td>
+      <td><select data-a="plan-set" data-day="${d}">${opts(p.recipeId)}</select></td>
+      <td>${r?gbp(r.cost):'<span class="muted">—</span>'}</td>
+      <td>${action}</td></tr>`;
+  }).join("");
+  return `<div class="card"><h2>This week</h2>
+    <table><thead><tr><th>Day</th><th>Dinner</th><th>Cost</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+    <p class="row" style="margin-top:10px"><button class="b" data-a="plan-generate">Generate random week</button> <button class="b" data-a="plan-confirm">Confirm week (PDF)</button> <button class="s" data-a="plan-clear">Clear week</button></p><p class="note">Generate fills Monday to Thursday and Sunday with five dinners, no more than two of any carb. Friday is chicken nuggets and Saturday is pizza. No sandwiches or wraps. Cooked days are left alone.</p></div>`;
+}
+
+const SECTIONS=["Fruit & Veg","Meat & Fish","Dairy & Eggs","Cupboard & Baking","Spices & Seasonings","Breakfast & Treats","Drinks","Frozen","Toiletries & Household","Other"];
+function sectionFor(name){
+  const n=String(name).toLowerCase();
+  const rules=[
+    [/shampoo|shower|toothpaste|toothbrush|deodorant|toilet roll|washing up|bin bag|handwash/,"Toiletries & Household"],
+    [/\bpop\b|cola|lemonade|fizzy|juice|squash/,"Drinks"],
+    [/oats|granola|cereal|honey|jam\b|cake|biscuit|chocolate|ice cream|crisps/,"Breakfast & Treats"],
+    [/frozen/,"Frozen"],
+    [/seasoning|spice|paprika|thyme|oregano|rosemary|cinnamon|granules|herbes|salt|jerk/,"Spices & Seasonings"],
+    [/stock|bicarbonate|cornflour|flour|breadcrumb|crispy onion|sauce|soy|oil\b|ketjap|sriracha|relish|puree|purée|miso|paste|vinegar|rice wine|glaze|tinned|tin\b|passata|kidney|chickpea|bean|coconut|pineapple|sweetcorn|pasta|penne|fusilli|spaghetti|macaroni|rigatoni|linguine|tagliatelle|fettuccine|orzo|gnocchi|rice\b|basmati|arborio|paella|noodle|sun-dried|chopped tomato/,"Cupboard & Baking"],
+    [/mince|sausage|bacon|\bham\b|chorizo|pepperoni|salmon|\bcod\b|fish|prawn|steak|thigh|chicken|beef|pork|lamb|pudding/,"Meat & Fish"],
+    [/milk|egg|cream|cheese|cheddar|parmesan|mozzarella|feta|butter|yoghurt|yogurt|fraiche|soured|natural/,"Dairy & Eggs"],
+    [/banana|apple|clementine|grape|strawberr|blueberr|onion|garlic|pepper|potato|tomato|carrot|leek|cucumber|lettuce|spinach|mushroom|\bpea|broccoli|pak choi|avocado|lime|lemon|chilli|ginger|courgette|salad|coriander|parsley|basil|mint|dill|bunch/,"Fruit & Veg"]
+  ];
+  const r=rules.find(([re])=>re.test(n));
+  return r?r[1]:"Other";
+}
+function vShop(){
+  const conv={tbsp:15,tsp:5};
+  const list=shopping();
+  const sorted=[...list].sort((a,b)=>SECTIONS.indexOf(sectionFor(a.name))-SECTIONS.indexOf(sectionFor(b.name)));
+  let lastSec="";
+  const listRows=sorted.map(x=>{
+    const sec=sectionFor(x.name);
+    const head=sec!==lastSec?`<tr class="sec"><td colspan="7">${sec}</td></tr>`:"";
+    lastSec=sec;
+    const b=bandFor(x.name,x.buy,x.unit);
+    let q=x.buy, u=x.unit;
+    if(b){
+      if(conv[normU(x.unit)]) q=+(b.packs*b.pack/conv[normU(x.unit)]).toFixed(2);
+      else if(normU(b.unitName)===normU(x.unit)) q=b.packs*b.pack;
+    }
+    return head+`<tr>
+      <td>${esc(x.name)}</td><td>${x.qty} ${esc(x.unit)}</td><td>${x.have} ${esc(x.unit)}</td>
+      <td><strong>${x.buy} ${esc(x.unit)}</strong></td><td>${costCell(x)}</td>
+      <td><input type="number" step="0.01" min="0" placeholder="£ paid" data-a="actual" data-name="${esc(x.name)}" data-unit="${esc(x.unit)}" data-buy="${x.buy}" style="width:90px"></td>
+      <td><button class="s" data-a="shop-bought" data-name="${esc(x.name)}" data-unit="${esc(u)}" data-buy="${q}">Bought</button> <span class="note">adds ${q} ${esc(u)}</span></td></tr>`;
+  }).join("");
+  return `<div class="card shop"><h2>Shopping list</h2>
+    <table><thead><tr><th>Item</th><th>Needed</th><th>In stock</th><th>To buy</th><th>Est. cost (shelf price)</th><th>Actual paid (£)</th><th></th></tr></thead>
+    <tbody>${listRows||'<tr><td colspan="7" class="muted">Nothing to buy. Your stock covers the plan, or no dinners are planned.</td></tr>'}</tbody></table>
+    <p class="row"><strong>Estimated shop: ${totalBand(list)}</strong></p><p class="note">“Bought” adds the whole pack to stock, so anything left over stays in stock for later meals. Anything marked low is topped up to one spare pack. Prices are rough Tesco-style estimates, not live shelf prices. Type what you paid in Actual paid (for the whole line) and future estimates for that item use your price. Items with no price show as pantry or not priced.</p></div>`;
+}
+
+function vBudget(){
+  const meals=Math.max(1,Number(S.box.meals)||1);
+  const people=Math.max(1,Number(S.box.people)||1);
+  const boxPerDinner=S.box.cost/meals;
+  const boxPerServing=S.box.cost/(meals*people);
+  const tLow=S.target.low/meals, tHigh=S.target.high/meals;
+  const planned=DAYS.map(d=>{const p=S.plan[d]; return S.recipes.find(x=>x.id===p?.recipeId);}).filter(Boolean);
+  const count=planned.length;
+  const disc=0;
+  const total=planned.reduce((a,r)=>a+r.cost,0)*(1-disc);
+  const avg=count?total/count:0;
+  const projected=avg*meals;
+  let verdict;
+  if(!count) verdict="Plan some dinners on the Plan tab to compare.";
+  else if(avg<=tHigh) verdict=`<span class="ok">Within target: ${gbp(avg)} per dinner against ${gbp(tHigh)} at most.</span>`;
+  else verdict=`<span class="low">Over target by ${gbp(avg-tHigh)} per dinner.</span>`;
+  return `<div class="card"><h2>Your box</h2>
+    <div class="row">Box price £<input type="number" step="0.01" data-f="box.cost" value="${S.box.cost}" style="width:100px">
+      for <input type="number" min="1" data-f="box.meals" value="${S.box.meals}" style="width:70px"> dinners,
+      <input type="number" min="1" data-f="box.people" value="${S.box.people}" style="width:70px"> people</div>
+    <div class="row" style="margin-top:10px">Shelf prices, no discount applied</div>
+    <div class="row" style="margin-top:10px">Target for the week: £<input type="number" step="0.01" data-f="target.low" value="${S.target.low}" style="width:90px">
+      to £<input type="number" step="0.01" data-f="target.high" value="${S.target.high}" style="width:90px"></div>
+  </div>
+  <div class="grid">
+    <div class="card"><div class="muted">Box now, per dinner</div><div class="big">${gbp(boxPerDinner)}</div><div class="note">${gbp(boxPerServing)} per serving</div></div>
+    <div class="card"><div class="muted">Target, per dinner</div><div class="big">${gbp(tLow)} to ${gbp(tHigh)}</div><div class="note">${gbp(S.target.low)} to ${gbp(S.target.high)} for ${meals} dinners</div></div>
+    <div class="card"><div class="muted">Your plan, per dinner</div><div class="big">${count?gbp(avg):'—'}</div><div class="note">${count} dinner${count===1?'':'s'} planned</div></div>
+    <div class="card"><div class="muted">Projected ${meals}-dinner week</div><div class="big">${count?gbp(projected):'—'}</div><div class="note">${count?gbp(S.box.cost-projected)+' less than the box':''}</div></div>
+  </div>
+  <div class="card">${verdict}</div>`;
+}
+
+const OLD_STARTER=[
+  {name:"Chicken pasta with nut-free pesto",servings:4,cost:9.5,prep:10,cook:20,ingredients:[{name:"Fusilli pasta",qty:400,unit:"g"},{name:"Chicken breast",qty:500,unit:"g"},{name:"Nut-free pesto (check label)",qty:190,unit:"g"},{name:"Cherry tomatoes",qty:250,unit:"g"},{name:"Parmesan",qty:40,unit:"g"}]},
+  {name:"Sausage and mash with onion gravy",servings:4,cost:7.5,prep:15,cook:35,ingredients:[{name:"Pork sausages",qty:8,unit:"each"},{name:"Potatoes",qty:1000,unit:"g"},{name:"Butter",qty:50,unit:"g"},{name:"Milk",qty:100,unit:"ml"},{name:"Onion",qty:1,unit:"each"},{name:"Beef stock cube",qty:1,unit:"each"}]},
+  {name:"Honey soy salmon with rice",servings:4,cost:11,prep:10,cook:20,ingredients:[{name:"Salmon fillets",qty:4,unit:"each"},{name:"Basmati rice",qty:300,unit:"g"},{name:"Soy sauce",qty:60,unit:"ml"},{name:"Honey",qty:30,unit:"ml"},{name:"Spring onions",qty:3,unit:"each"}]},
+  {name:"Lemon garlic chicken traybake",servings:4,cost:9,prep:10,cook:40,ingredients:[{name:"Chicken thighs",qty:8,unit:"each"},{name:"Baby potatoes",qty:800,unit:"g"},{name:"Lemon",qty:1,unit:"each"},{name:"Garlic",qty:2,unit:"each"},{name:"Olive oil",qty:2,unit:"tbsp"}]},
+  {name:"Beef burgers with wedges",servings:4,cost:10,prep:20,cook:25,ingredients:[{name:"Beef mince",qty:500,unit:"g"},{name:"Brioche buns",qty:4,unit:"each"},{name:"Cheddar slices",qty:4,unit:"each"},{name:"Potatoes",qty:800,unit:"g"},{name:"Olive oil",qty:2,unit:"tbsp"}]},
+  {name:"Sausage and tomato pasta bake",servings:4,cost:7,prep:10,cook:30,ingredients:[{name:"Pork sausages",qty:6,unit:"each"},{name:"Penne pasta",qty:400,unit:"g"},{name:"Tinned tomatoes",qty:2,unit:"tin"},{name:"Mozzarella",qty:125,unit:"g"},{name:"Garlic",qty:2,unit:"each"}]},
+  {name:"Crispy cod and chips",servings:4,cost:10,prep:15,cook:25,ingredients:[{name:"Cod fillets",qty:4,unit:"each"},{name:"Breadcrumbs",qty:100,unit:"g"},{name:"Plain flour",qty:50,unit:"g"},{name:"Egg",qty:1,unit:"each"},{name:"Potatoes",qty:1000,unit:"g"}]}
+];
+const NEW_R=[
+["Sausage and spinach orecchiette","Pasta","Hob",20,"Orecchiette 400 g; pork sausages 6; spinach 200 g; garlic 2 cloves; chilli flakes 1 tsp; parmesan 40 g","None expected",7.00],
+["Bacon, pea and cream fusilli","Pasta","Hob",18,"Fusilli 400 g; smoked bacon 150 g; frozen peas 150 g; double cream 150 ml; parmesan 40 g","None expected",7.50],
+["Garlic chilli prawn linguine","Pasta","Hob",20,"Linguine 400 g; king prawns 400 g; garlic 3 cloves; red chilli 1; lemon 1; olive oil 2 tbsp","None expected",10.00],
+["Quick beef ragu tagliatelle","Pasta","Hob",25,"Tagliatelle 400 g; beef mince 500 g; onion 1; carrot 1; chopped tomatoes 2 tins; beef stock cube 1; tomato purée 1 tbsp","Check stock cube label",9.00],
+["Smoked salmon and dill linguine","Pasta","Hob",20,"Fusilli 400 g; salmon fillets 2; crème fraîche 150 g; lemon 1; dill 1 bunch","None expected",10.00],
+["Cajun chicken penne","Pasta","Hob",22,"Penne 400 g; chicken thighs 500 g; Cajun seasoning 2 tsp; double cream 150 ml; red pepper 1; garlic 2 cloves","Check Cajun seasoning label",8.00],
+["Pepperoni and mozzarella rigatoni","Pasta","Hob",15,"Rigatoni 400 g; pepperoni 100 g; chopped tomatoes 1 tin; mozzarella 125 g; garlic 2 cloves","Check pepperoni label",6.50],
+["Chicken tikka penne","Pasta","Hob",22,"Penne 400 g; chicken breast 500 g; tikka paste 3 tbsp; natural yoghurt 150 g; onion 1; spinach 100 g","Check tikka paste label",8.00],
+["Ham and leek carbonara","Pasta","Hob",20,"Spaghetti 400 g; ham 150 g; leek 1; eggs 3; parmesan 50 g; garlic 1 clove","None expected",6.50],
+["Cheeseburger macaroni","Pasta","Hob",20,"Macaroni 400 g; beef mince 500 g; onion 1; passata 400 g; cheddar 120 g; gherkins 4","None expected",8.00],
+["Tuna and sweetcorn fusilli","Pasta","Hob",15,"Fusilli 400 g; tinned tuna 2 tins; sweetcorn 200 g; chopped tomatoes 1 tin; garlic 1 clove; lemon 1","None expected",6.00],
+["Chorizo and chickpea pasta","Pasta","Hob",20,"Pasta 400 g; chorizo 150 g; tinned chickpeas 1 tin; chopped tomatoes 1 tin; garlic 2 cloves; spinach 150 g","None expected",7.50],
+["Lemon chicken orzo with feta","Pasta","Hob",22,"Orzo 300 g; chicken thighs 500 g; lemon 1; feta 100 g; spinach 100 g; garlic 2 cloves","Check feta label",8.50],
+["Turkey bolognese spaghetti","Pasta","Hob",22,"Spaghetti 400 g; turkey mince 500 g; onion 1; chopped tomatoes 2 tins; tomato purée 1 tbsp; garlic 2 cloves","None expected",7.00],
+["Chicken and bacon alfredo","Pasta","Hob",22,"Fettuccine 400 g; chicken breast 500 g; smoked bacon 100 g; double cream 200 ml; parmesan 60 g; garlic 2 cloves","None expected",9.00],
+["Cajun prawn penne","Pasta","Hob",20,"Penne 400 g; king prawns 400 g; Cajun seasoning 2 tsp; double cream 150 ml; red pepper 1; spring onions 3","Check Cajun seasoning label",10.00],
+["Smoked salmon and lemon linguine","Pasta","Hob",15,"Linguine 400 g; smoked salmon 150 g; crème fraîche 150 g; lemon 1; dill 1 bunch","None expected",10.00],
+["Chicken, chorizo and sun-dried tomato fusilli","Pasta","Hob",22,"Fusilli 400 g; chicken breast 400 g; chorizo 100 g; sun-dried tomatoes 100 g; double cream 100 ml; spinach 100 g","Check sun-dried tomato jar label",9.00],
+["Beef stroganoff tagliatelle","Pasta","Hob",22,"Tagliatelle 400 g; beef sirloin strips 400 g; mushrooms 250 g; onion 1; soured cream 200 g; beef stock cube 1; mustard 1 tsp","Check stock cube label",11.00],
+["Sausage and pepper rigatoni","Pasta","Hob",20,"Rigatoni 400 g; pork sausages 6; red peppers 2; passata 400 g; garlic 2 cloves; mozzarella 125 g","None expected",7.00],
+["Chicken Caesar penne","Pasta","Hob",20,"Penne 400 g; chicken breast 500 g; romaine lettuce 1; Caesar dressing 4 tbsp; parmesan 50 g","Check dressing label",8.50],
+["Spicy sausage arrabbiata","Pasta","Hob",20,"Penne 400 g; pork sausages 6; chopped tomatoes 2 tins; chilli flakes 1 tsp; garlic 2 cloves; parmesan 40 g","None expected",6.50],
+["Prawn and pesto penne","Pasta","Hob",18,"Penne 400 g; king prawns 400 g; nut-free pesto 150 g; cherry tomatoes 250 g; spinach 100 g","Pesto: nut-free only, check label",10.00],
+["Beef chilli macaroni","Pasta","Hob",25,"Macaroni 350 g; beef mince 500 g; kidney beans 1 tin; chopped tomatoes 2 tins; chilli powder 1 tbsp; onion 1; cheddar 80 g","None expected",8.00],
+["Chicken fried rice","Rice","Hob",20,"Basmati rice 300 g; chicken breast 500 g; eggs 3; frozen peas 150 g; soy sauce 3 tbsp; spring onions 3","Check soy sauce label",8.00],
+["Chicken katsu bites with rice","Rice","Air fryer",25,"Chicken breast 500 g; panko breadcrumbs 100 g; plain flour 50 g; eggs 2; basmati rice 300 g; katsu sauce 4 tbsp","Check katsu sauce label",9.00],
+["Beef and broccoli rice stir-fry","Rice","Hob",20,"Basmati rice 300 g; beef sirloin 500 g; tenderstem broccoli 200 g; oyster sauce 2 tbsp; soy sauce 2 tbsp; garlic 2 cloves; cornflour 1 tsp","Check oyster sauce label",11.00],
+["Sweet chilli salmon with rice","Rice","Air fryer",18,"Salmon fillets 4; basmati rice 300 g; sweet chilli sauce 4 tbsp; lime 1; spring onions 2","Check sweet chilli sauce label",11.00],
+["Chorizo and prawn rice","Rice","Hob",25,"Paella rice 300 g; chorizo 150 g; king prawns 300 g; chicken stock cube 1; red pepper 1; frozen peas 100 g; smoked paprika 1 tsp","Check stock cube label",12.00],
+["Jerk chicken and black bean rice","Rice","Air fryer",22,"Chicken thighs 8; jerk seasoning 2 tbsp; basmati rice 300 g; tinned black beans 1 tin; lime 1","Check jerk seasoning label",9.00],
+["Beef burrito bowls","Rice","Hob",20,"Rice 300 g; beef mince 500 g; kidney beans 1 tin; sweetcorn 150 g; taco seasoning 1 packet; salsa 200 g; cheddar 80 g","Check taco seasoning label",8.50],
+["Korean chicken rice bowls","Rice","Hob",22,"Rice 300 g; chicken thighs 500 g; gochujang 3 tbsp; soy sauce 2 tbsp; honey 1 tbsp; cucumber 1; spring onions 3","Check gochujang label",9.00],
+["Greek lemon chicken and rice","Rice","Hob",22,"Rice 300 g; chicken breast 500 g; lemon 1; feta 100 g; cucumber 1; tomatoes 2; dried oregano 1 tsp","Check feta label",8.50],
+["Sweet and sour pork rice","Rice","Hob",20,"Rice 300 g; pork loin 500 g; tinned pineapple chunks 1 tin; peppers 2; sweet and sour sauce 4 tbsp; cornflour 1 tbsp","Check sauce label",9.00],
+["Cajun salmon and rice","Rice","Air fryer",15,"Salmon fillets 4; Cajun seasoning 2 tsp; basmati rice 300 g; red onion 1; lime 1","Check Cajun seasoning label",11.00],
+["Chicken biryani-style rice","Rice","Hob",25,"Basmati rice 300 g; chicken thighs 500 g; biryani paste 3 tbsp; natural yoghurt 150 g; onion 1; frozen peas 100 g","Check biryani paste label",9.50],
+["Teriyaki beef rice bowls","Rice","Hob",18,"Rice 300 g; beef sirloin 500 g; teriyaki sauce 4 tbsp; pak choi 2; spring onions 3","Check teriyaki sauce label",11.00],
+["Turkey and sweetcorn chilli rice","Rice","Hob",22,"Rice 300 g; turkey mince 500 g; sweetcorn 150 g; chopped tomatoes 1 tin; kidney beans 1 tin; chilli powder 1 tbsp","None expected",7.50],
+["Ham fried rice","Rice","Hob",15,"Rice 300 g; ham 200 g; eggs 3; frozen peas 100 g; soy sauce 3 tbsp","Check soy sauce label",6.50],
+["Chicken yakitori rice","Rice","Hob",20,"Rice 300 g; chicken thighs 500 g; yakitori sauce 4 tbsp; spring onions 3; sesame seeds 1 tbsp","Check yakitori sauce label",9.00],
+["Prawn and coconut curry rice","Rice","Hob",20,"Basmati rice 300 g; king prawns 400 g; coconut milk 1 tin; green curry paste 3 tbsp; spinach 150 g; lime 1","Check curry paste label",10.00],
+["Sausage and pea rice pilaf","Rice","Hob",22,"Basmati rice 300 g; pork sausages 6; onion 1; chicken stock cube 1; frozen peas 100 g; mixed herbs 1 tsp","Check stock cube label",7.00],
+["Chicken and chorizo rice","Rice","Hob",22,"Rice 300 g; chicken thighs 400 g; chorizo 150 g; peppers 2; chicken stock cube 1; smoked paprika 1 tsp","Check stock cube label",9.00],
+["Chicken and mushroom risotto","Rice","Hob",25,"Arborio rice 300 g; chicken breast 500 g; mushrooms 250 g; onion 1; chicken stock cube 1; parmesan 50 g; butter 25 g","Check stock cube label",9.00],
+["Lemon and pea rice with cod","Rice","Air fryer",20,"Cod fillets 4; basmati rice 300 g; frozen peas 150 g; lemon 1; butter 25 g; dill 1 bunch","None expected",10.00],
+["Lamb rice bowls with cucumber yoghurt","Rice","Hob",22,"Lamb mince 500 g; rice 300 g; natural yoghurt 200 g; cucumber 1; ground cumin 1 tsp; mint 1 bunch","None expected",11.00],
+["Chicken and pepper rice","Rice","Hob",20,"Chicken thighs 500 g; rice 300 g; peppers 2; smoked paprika 1 tsp; chicken stock cube 1","Check stock cube label",8.00],
+["Chilli garlic prawn rice","Rice","Hob",15,"King prawns 400 g; rice 300 g; red chillies 2; garlic 3 cloves; lime 1; spring onions 3","None expected",10.00],
+["Thai red chicken rice","Rice","Hob",22,"Chicken breast 500 g; rice 300 g; red curry paste 3 tbsp; coconut milk 1 tin; lime 1; spinach 100 g","Check curry paste label",9.00],
+["Sausage and egg fried rice","Rice","Hob",20,"Pork sausages 6; rice 300 g; eggs 3; frozen peas 100 g; soy sauce 2 tbsp","Check soy sauce label",7.00],
+["Chicken and leek rice bowls","Rice","Hob",22,"Rice 300 g; chicken thighs 500 g; leeks 2; double cream 100 ml; chicken stock cube 1; thyme 1 tsp","Check stock cube label",9.00],
+["Lemon garlic prawn bowls","Rice","Hob",15,"King prawns 400 g; rice 300 g; lemon 1; garlic 3 cloves; butter 25 g; spinach 100 g","None expected",10.00],
+["Ham and pea risotto-style rice","Rice","Hob",20,"Arborio rice 300 g; ham 150 g; frozen peas 150 g; onion 1; chicken stock cube 1; parmesan 40 g","Check stock cube label",6.50],
+["Chicken parm bites with wedges","Potato","Air fryer",25,"Chicken breast 500 g; panko breadcrumbs 100 g; eggs 2; passata 200 g; mozzarella 125 g; potatoes 800 g","None expected",9.00],
+["Garlic mushroom and steak gnocchi","Pasta","Hob",18,"Gnocchi 500 g; beef sirloin 400 g; mushrooms 250 g; garlic 3 cloves; butter 50 g; parsley 1 bunch","Check gnocchi label",10.00],
+["Sausage and bean penne","Pasta","Hob",18,"Penne 400 g; pork sausages 6; baked beans 1 tin; chopped tomatoes 1 tin; onion 1; mixed herbs 1 tsp","Check baked beans label",6.00],
+["Chicken and sun-dried tomato gnocchi","Pasta","Hob",20,"Gnocchi 500 g; chicken breast 400 g; sun-dried tomatoes 100 g; spinach 100 g; double cream 100 ml; parmesan 40 g","Check sun-dried tomato jar label",9.50],
+["Beef bolognese with penne","Pasta","Hob",22,"Penne 400 g; beef mince 500 g; onion 1; garlic 2 cloves; passata 400 g; parmesan 40 g","None expected",8.00],
+["Chicken and potato curry","Potato","Hob",25,"Chicken thighs 500 g; potatoes 800 g; onion 1; mild curry paste 3 tbsp; coconut milk 1 tin; spinach 100 g","Check curry paste label",8.50],
+["Chicken and garlic crispy potatoes","Potato","Air fryer",25,"Chicken thighs 8; baby potatoes 800 g; olive oil 2 tbsp; garlic powder 1 tsp; paprika 1 tsp","Check spice label",9.00],
+["Chicken katsu wedges","Potato","Air fryer",25,"Chicken breast 500 g; panko breadcrumbs 100 g; eggs 2; potatoes 800 g; katsu sauce 4 tbsp","Check katsu sauce label",9.50],
+["Crispy cod and chips (air fryer)","Potato","Air fryer",25,"Cod fillets 4; potatoes 1000 g; breadcrumbs 100 g; egg 1; plain flour 50 g; tartare sauce 4 tbsp","Check tartare sauce label",10.00],
+["Sausage and pepper hash","Potato","Hob",25,"Pork sausages 6; potatoes 800 g; onion 1; peppers 1; eggs 4; smoked paprika 1 tsp","None expected",7.50],
+["Bacon and potato hash with eggs","Potato","Hob",20,"Smoked bacon 200 g; potatoes 800 g; onion 1; eggs 6; cheddar 80 g","None expected",7.00],
+["Steak and chips (air fryer)","Potato","Air fryer",22,"Sirloin steaks 4 (about 500 g); potatoes 800 g; rapeseed oil 2 tbsp; garlic butter 50 g","Check garlic butter label",13.00],
+["Crispy chicken and smashed potatoes","Potato","Air fryer",22,"Chicken breast 500 g; baby potatoes 800 g; oil 2 tbsp; rosemary 1 tsp; garlic 2 cloves","None expected",9.00],
+["Pork schnitzel with mash","Potato","Hob",25,"Pork loin steaks 500 g; panko breadcrumbs 100 g; eggs 2; plain flour 50 g; potatoes 1000 g; butter 50 g; milk 100 ml","None expected",9.00],
+["Ham and cheese rosti","Potato","Hob",25,"Potatoes 1000 g; ham 150 g; cheddar 120 g; egg 1; butter 25 g","None expected",6.50],
+["Chilli stuffed jacket potatoes","Potato","Air fryer",25,"Jacket potatoes 4 (about 800 g); beef mince 500 g; kidney beans 1 tin; chopped tomatoes 1 tin; chilli powder 1 tbsp; cheddar 100 g","None expected",8.00],
+["Honey mustard salmon with new potatoes","Potato","Air fryer",22,"Salmon fillets 4; baby potatoes 800 g; wholegrain mustard 2 tbsp; honey 1 tbsp; olive oil 1 tbsp","Check mustard label",11.00],
+["Chicken chorizo potato hash","Potato","Hob",22,"Chicken thighs 500 g; chorizo 100 g; potatoes 800 g; peppers 1; onion 1","None expected",9.00],
+["Beef meatballs and mash","Potato","Hob",25,"Beef mince 500 g; breadcrumbs 50 g; egg 1; potatoes 1000 g; butter 50 g; beef stock cube 1","Check stock cube label",8.50],
+["Sausage and red onion air-fried potatoes","Potato","Air fryer",22,"Pork sausages 8; potatoes 800 g; red onion 1; oil 2 tbsp; mustard 1 tbsp","Check mustard label",7.50],
+["Prawn and potato tortilla","Potato","Hob",20,"King prawns 300 g; potatoes 800 g; eggs 6; garlic 2 cloves; parsley 1 bunch","None expected",9.00],
+["Chicken and bacon potato cakes","Potato","Hob",22,"Chicken mince 500 g; potatoes 800 g; smoked bacon 100 g; egg 1; plain flour 30 g","None expected",8.00],
+["Turkey burgers with fries (air fryer)","Potato","Air fryer",25,"Turkey mince 500 g; potatoes 800 g; burger seasoning 1 tbsp; cheese slices 4","Check burger seasoning label",8.00],
+["Sausage, egg and bean fry-up","Potato","Hob",20,"Pork sausages 6; potatoes 800 g; eggs 4; smoked bacon 100 g; baked beans 1 tin","Check baked beans label",7.50],
+["Steak and mushroom mash","Potato","Hob",25,"Sirloin steaks 4 (about 500 g); mushrooms 250 g; potatoes 1000 g; butter 60 g; milk 100 ml; beef stock cube 1","Check stock cube label",13.00],
+["Salmon fish cakes (air fryer)","Potato","Air fryer",25,"Salmon fillets 2; potatoes 800 g; egg 1; breadcrumbs 80 g; dill 1 tsp; lemon 1","None expected",9.00],
+["Chicken nuggets and chips","Potato","Air fryer",25,"Chicken breast 500 g; panko breadcrumbs 100 g; eggs 2; plain flour 50 g; potatoes 1000 g","None expected",8.50],
+["Chicken brioche burgers","Bread","Hob",20,"Chicken breast 500 g; brioche buns 4; lettuce 1; mayonnaise 4 tbsp; cheese slices 4; tomatoes 2","Check mayonnaise label",9.00],
+["Pork and apple brioche burgers","Bread","Hob",20,"Pork mince 500 g; brioche buns 4; eating apple 1; sage 1 tsp; red onion 1; mayonnaise 4 tbsp","Check mayonnaise label",9.00],
+["Chicken Caesar wraps","Bread","Hob",15,"Chicken breast 500 g; tortilla wraps 4; romaine lettuce 1; Caesar dressing 4 tbsp; parmesan 40 g","Check dressing label",8.50],
+["Steak and pepper fajita wraps","Bread","Hob",18,"Sirloin 400 g; tortilla wraps 4; peppers 2; red onion 1; fajita seasoning 2 tbsp; soured cream 150 g","Check seasoning label",10.00],
+["Cajun prawn baguettes","Bread","Hob",20,"Baguettes 4; king prawns 400 g; Cajun seasoning 2 tsp; plain flour 50 g; mayonnaise 4 tbsp; lettuce 1","Check Cajun seasoning label",10.00],
+["Ham and cheese toasties","Bread","Hob",12,"Thick sliced bread 8; ham 200 g; cheddar 150 g; Dijon mustard 1 tsp; butter 40 g","Check mustard label",6.00],
+["Chorizo and egg ciabatta","Bread","Air fryer",15,"Chorizo 150 g; eggs 4; ciabatta 1; mozzarella 125 g; basil 1 bunch","None expected",7.00],
+["Chicken schnitzel burgers","Bread","Hob",22,"Chicken breast 500 g; panko breadcrumbs 100 g; eggs 2; brioche buns 4; coleslaw 200 g; mayonnaise 4 tbsp","Check coleslaw and mayo labels",9.00],
+["Tuna melts","Bread","Hob",12,"Tinned tuna 2 tins; thick sliced bread 8; cheddar 150 g; mayonnaise 4 tbsp; sweetcorn 100 g","None expected",6.00],
+["Lamb kofta pittas","Bread","Hob",22,"Lamb mince 500 g; pitta breads 4; cucumber 1; natural yoghurt 200 g; ground cumin 1 tsp; mint 1 bunch","None expected",11.00],
+["Steak sandwiches","Bread","Hob",20,"Sirloin 400 g; ciabatta 4; red onion 1; rocket 1 bag; mushrooms 150 g; mustard 1 tbsp","Check mustard label",11.00],
+["Sausage rolls (air fryer)","Bread","Air fryer",20,"Pork sausages 6; ready-rolled puff pastry 1 pack; egg 1; mustard 1 tsp","Check pastry label",6.50],
+["Chicken quesadillas","Bread","Hob",18,"Tortilla wraps 4; chicken breast 400 g; cheddar 150 g; peppers 1; salsa 150 g","Check salsa label",8.00],
+["Ham and cheese panini (air fryer)","Bread","Air fryer",10,"Ciabatta 2; ham 150 g; mozzarella 100 g; tomato 1; basil 1 bunch","None expected",6.00],
+["Beef meatball subs","Bread","Hob",25,"Beef mince 500 g; breadcrumbs 50 g; egg 1; hot dog rolls 4; passata 400 g; mozzarella 125 g","None expected",8.50],
+["Fish finger sandwiches","Bread","Air fryer",15,"Fish fingers 16; bread rolls 4; tartare sauce 4 tbsp; coleslaw 200 g","Check tartare and coleslaw labels",7.00],
+["Chicken and bacon club wraps","Bread","Hob",18,"Chicken breast 400 g; smoked bacon 150 g; tortilla wraps 4; lettuce 1; tomatoes 2; mayonnaise 4 tbsp","Check mayonnaise label",9.00],
+["Sausage and onion baguettes","Bread","Air fryer",20,"Pork sausages 6; baguettes 2; onions 2; mustard 1 tbsp; ketchup 4 tbsp","Check condiment labels",6.00],
+["Prawn and avocado tacos","Bread","Hob",15,"King prawns 400 g; tortillas 8; avocados 2; lime 1; red chilli 1; coriander 1 bunch","None expected",10.00],
+["Turkey and cranberry toasties","Bread","Hob",12,"Turkey slices 200 g; thick sliced bread 8; cheddar 150 g; cranberry sauce 4 tbsp","Check cranberry sauce label",7.00],
+["Beef French dip baguettes","Bread","Hob",25,"Baguettes 4; beef sirloin 400 g; onions 2; beef stock cubes 2; cheddar 120 g","Check stock cube label",11.00],
+["Bacon and egg breakfast rolls","Bread","Air fryer",12,"Smoked bacon 8 rashers; bread rolls 4; eggs 4; cheddar 80 g","None expected",6.50],
+["Chicken and leek mash bowl","Potato","Hob",25,"Chicken thighs 500 g; leeks 2; potatoes 1000 g; butter 50 g; milk 100 ml; chicken stock cube 1; double cream 50 ml","Check stock cube label",9.00],
+["Lemon and garlic chicken with rice","Rice","Hob",22,"Chicken breast 500 g; basmati rice 300 g; lemon 1; garlic 2 cloves; olive oil 2 tbsp; spinach 150 g","None expected",8.50],
+["Chicken and mushroom tagliatelle","Pasta","Hob",20,"Tagliatelle 400 g; chicken breast 500 g; mushrooms 250 g; double cream 150 ml; parmesan 40 g; garlic 2 cloves","Check parmesan label",8.50],
+["Pizza night","Bread","Air fryer",15,"Ready-made pizza 2 (about 800 g); side salad 1 bag; garlic dip 4 tbsp","Check pizza and dip labels",8.00]
+];
+const parseIng=s=>s.split("; ").map(p=>{const m=p.match(/^(.*?)\s+(\d+(?:\.\d+)?)\s*(.*)$/);return m?{name:m[1].trim(),qty:+m[2],unit:(m[3]||"each").trim()}:{name:p.trim(),qty:1,unit:"each"};});
+const STARTER=NEW_R.map(x=>({name:x[0],carb:x[1],method:x[2],prep:x[3],cook:0,nut:x[5],cost:x[6],servings:4,ingredients:parseIng(x[4])}));
+const METHODS={};
+METHODS["Sausage and spinach orecchiette"]=["Boil the orecchiette in salted water for 10 minutes. Keep a cup of the cooking water.","Snip the sausages out of their skins and fry for 6 minutes, breaking them up, until browned.","Add the garlic and chilli flakes for 1 minute, then the spinach until wilted.","Drain the pasta into the pan with the parmesan and a splash of water. Toss and serve."];
+METHODS["Bacon, pea and cream fusilli"]=["Boil the fusilli for 10 minutes, adding the peas for the last 2 minutes.","Fry the bacon in a dry pan for about 5 minutes until crisp.","Pour in the cream and simmer for 2 minutes. Stir in the parmesan.","Drain the pasta and peas, toss through the sauce and serve."];
+METHODS["Garlic chilli prawn linguine"]=["Cook the linguine in salted water for 9 minutes, then drain.","Fry the sliced garlic and chilli in oil for 1 minute.","Add the prawns and cook 2 to 3 minutes until pink.","Toss the linguine through with lemon zest and juice."];
+METHODS["Quick beef ragu tagliatelle"]=["Brown the beef mince in a hot pan for 5 minutes, breaking it up.","Add the onion and carrot and cook 5 minutes until soft.","Stir in the purée and crumbled stock cube, then the tomatoes. Simmer 12 minutes.","Cook the tagliatelle for 8 minutes, drain and toss with the ragu."];
+METHODS["Smoked salmon and dill linguine"]=["Pan-fry the salmon fillets 4 minutes each side, then flake.","Boil the fusilli for 10 minutes and drain, keeping a little water.","Warm the crème fraîche and lemon zest in the pan on low heat.","Toss the pasta, salmon and chopped dill through the sauce."];
+METHODS["Cajun chicken penne"]=["Cook the penne for 10 minutes and drain.","Season the sliced chicken with Cajun spice and fry 6 minutes until cooked.","Add the peppers and garlic for 3 minutes, then the cream and simmer 3 minutes.","Toss the penne through the sauce and serve."];
+METHODS["Pepperoni and mozzarella rigatoni"]=["Cook the rigatoni for 11 minutes and drain.","Fry the pepperoni for 2 minutes until its oil releases.","Add the garlic and tomatoes and simmer 5 minutes.","Stir in the torn mozzarella until melted, then toss with the pasta."];
+METHODS["Chicken tikka penne"]=["Cook the penne for 10 minutes and drain.","Fry the chicken with the tikka paste for 6 minutes, then add the onion for 3 minutes.","Stir in the yoghurt, then the spinach until wilted.","Toss the pasta through and serve."];
+METHODS["Ham and leek carbonara"]=["Cook the spaghetti for 10 minutes. Reserve a cup of water.","Fry the sliced leek and ham in a little butter for 5 minutes.","Whisk the eggs with the parmesan and pour over the hot pasta off the heat, adding water to loosen.","Stir in the ham and leek and serve straight away."];
+METHODS["Cheeseburger macaroni"]=["Cook the macaroni for 8 minutes and drain.","Brown the beef mince with the onion for 6 minutes.","Stir in the passata and simmer 5 minutes, then melt in the cheddar.","Toss with the macaroni and top with chopped gherkins."];
+METHODS["Tuna and sweetcorn fusilli"]=["Cook the fusilli for 10 minutes and drain.","Fry the garlic for 1 minute, then add the tomatoes and simmer 5 minutes.","Stir in the drained tuna and sweetcorn for 2 minutes.","Toss with the pasta and finish with lemon juice."];
+METHODS["Chorizo and chickpea pasta"]=["Cook the pasta for 10 minutes and drain.","Fry the sliced chorizo for 3 minutes until its oil releases.","Add the garlic, chickpeas and tomatoes and simmer 5 minutes.","Stir in the spinach until wilted, then toss with the pasta."];
+METHODS["Lemon chicken orzo with feta"]=["Cook the orzo for 10 minutes, then drain.","Fry the chicken thighs for 8 minutes until cooked through.","Add the garlic and lemon zest, then the spinach until wilted.","Toss with the orzo and crumbled feta. Serve with lemon wedges."];
+METHODS["Turkey bolognese spaghetti"]=["Brown the turkey mince for 6 minutes, breaking it up.","Add the onion and garlic and cook 4 minutes.","Stir in the tomatoes and purée and simmer 10 minutes.","Cook the spaghetti for 10 minutes, drain and toss with the sauce."];
+METHODS["Chicken and bacon alfredo"]=["Cook the fettuccine for 10 minutes. Keep a cup of water.","Fry the chicken and bacon for 8 minutes until golden.","Add the garlic, then the cream and parmesan. Simmer 3 minutes.","Toss the pasta through, loosening with water if needed."];
+METHODS["Cajun prawn penne"]=["Cook the penne for 10 minutes and drain.","Fry the prawns with the Cajun spice for 2 minutes.","Add the peppers for 3 minutes, then the cream and simmer 2 minutes.","Toss the penne through and top with sliced spring onions."];
+METHODS["Smoked salmon and lemon linguine"]=["Cook the linguine for 9 minutes and drain.","Warm the crème fraîche with lemon zest and juice on low heat.","Tear in the smoked salmon and dill off the heat.","Toss the pasta through the sauce and serve."];
+METHODS["Chicken, chorizo and sun-dried tomato fusilli"]=["Cook the fusilli for 10 minutes and drain.","Fry the chicken and sliced chorizo for 8 minutes.","Add the sun-dried tomatoes and cream, simmer 2 minutes, then stir in the spinach.","Toss through the pasta and serve."];
+METHODS["Beef stroganoff tagliatelle"]=["Cook the tagliatelle for 8 minutes and drain.","Fry the beef strips in a hot pan for 2 minutes, then set aside.","Fry the onion and mushrooms for 6 minutes, then add the stock cube and mustard.","Stir in the soured cream and beef, then toss with the pasta."];
+METHODS["Sausage and pepper rigatoni"]=["Cook the rigatoni for 11 minutes and drain.","Fry the sausages for 6 minutes, breaking them up, then add the sliced peppers.","Add the garlic and passata and simmer 5 minutes.","Toss the pasta through with torn mozzarella."];
+METHODS["Chicken Caesar penne"]=["Cook the penne for 10 minutes and drain.","Fry the chicken for 6 minutes until cooked through, then slice.","Toss the penne with the Caesar dressing and shredded lettuce.","Top with the chicken and grated parmesan."];
+METHODS["Spicy sausage arrabbiata"]=["Cook the penne for 10 minutes and drain.","Fry the sausages for 6 minutes, breaking them up.","Add the garlic, chilli flakes and tomatoes and simmer 8 minutes.","Toss through the penne and top with parmesan."];
+METHODS["Prawn and pesto penne"]=["Cook the penne for 10 minutes and drain.","Fry the prawns for 2 to 3 minutes until pink.","Halve the cherry tomatoes and wilt the spinach in a pan for 2 minutes.","Toss the penne with the pesto, prawns, tomatoes and spinach."];
+METHODS["Beef chilli macaroni"]=["Cook the macaroni for 8 minutes and drain.","Brown the beef mince with the onion for 6 minutes.","Add the chilli powder, tomatoes and kidney beans and simmer 10 minutes.","Toss through the macaroni and melt in the cheddar."];
+METHODS["Garlic mushroom and steak gnocchi"]=["Fry the gnocchi in butter for 6 minutes until golden, then set aside.","Sear the sliced steak for 2 minutes, rest, and add the mushrooms for 4 minutes.","Add the garlic for 1 minute, then return the gnocchi and steak.","Scatter with chopped parsley and serve."];
+METHODS["Sausage and bean penne"]=["Cook the penne for 10 minutes and drain.","Fry the sausages for 6 minutes, breaking them up, with the onion.","Add the tomatoes, beans and herbs and simmer 6 minutes.","Toss through the penne and serve."];
+METHODS["Chicken and sun-dried tomato gnocchi"]=["Fry the gnocchi in a little oil for 5 minutes until golden.","Fry the chicken for 6 minutes, then add the sun-dried tomatoes.","Stir in the cream and parmesan, then the spinach until wilted.","Toss the gnocchi through the sauce and serve."];
+METHODS["Beef bolognese with penne"]=["Brown the beef mince for 6 minutes with the garlic.","Add the passata and simmer for 10 minutes.","Cook the penne for 10 minutes and drain.","Toss the penne through the sauce and top with parmesan."];
+METHODS["Chicken and mushroom tagliatelle"]=["Cook the tagliatelle for 8 minutes and drain.","Fry the chicken for 6 minutes, then add the mushrooms and garlic for 4 minutes.","Pour in the cream and parmesan and simmer 2 minutes.","Toss the pasta through and serve."];
+METHODS["Pizza night"]=["Heat the air fryer to 200C.","Cook the pizzas for 8 to 10 minutes until bubbling.","Toss the salad and serve with the garlic dip."];
+METHODS["Chicken fried rice"]=["Cook the rice in boiling water for 12 minutes, then cool it on a tray.","Fry the chicken in a hot wok for 6 minutes. Push to the side and scramble the eggs.","Add the rice, peas and soy sauce and stir-fry 4 minutes.","Finish with sliced spring onions."];
+METHODS["Chicken katsu bites with rice"]=["Cook the rice for 12 minutes.","Cut the chicken into bites, coat in flour, beaten egg and panko.","Air-fry at 200C for 12 minutes, turning halfway, until crisp and cooked.","Serve on the rice with katsu sauce."];
+METHODS["Beef and broccoli rice stir-fry"]=["Cook the rice for 12 minutes.","Slice the beef and toss with cornflour. Stir-fry in a hot pan for 3 minutes, then set aside.","Stir-fry the broccoli and garlic for 3 minutes, add the sauces and beef.","Serve on the rice."];
+METHODS["Sweet chilli salmon with rice"]=["Cook the rice for 12 minutes.","Brush the salmon with sweet chilli sauce and air-fry at 200C for 8 minutes.","Fluff the rice with lime juice.","Serve the salmon on the rice with spring onions."];
+METHODS["Chorizo and prawn rice"]=["Fry the chorizo for 3 minutes, then add the pepper and paprika.","Stir in the rice and stock. Simmer covered for 15 minutes.","Add the prawns and peas for the last 4 minutes until pink.","Rest 2 minutes before serving."];
+METHODS["Jerk chicken and black bean rice"]=["Rub the chicken thighs with jerk seasoning.","Air-fry at 200C for 18 minutes, turning once, until cooked through.","Cook the rice for 12 minutes and warm the beans.","Serve the chicken on the rice and beans with lime wedges."];
+METHODS["Beef burrito bowls"]=["Cook the rice for 12 minutes.","Brown the beef mince for 6 minutes with the taco seasoning and a splash of water.","Warm the beans and sweetcorn through.","Build bowls with rice, beef, beans, salsa and cheese."];
+METHODS["Korean chicken rice bowls"]=["Cook the rice for 12 minutes.","Mix the gochujang, soy and honey. Coat the chicken and fry 8 minutes.","Slice the cucumber and spring onions.","Build bowls with rice, chicken and vegetables."];
+METHODS["Greek lemon chicken and rice"]=["Cook the rice for 12 minutes.","Fry the chicken with lemon zest and oregano for 8 minutes until cooked.","Chop the cucumber and tomatoes and crumble the feta.","Serve the chicken on the rice with the salad and feta."];
+METHODS["Sweet and sour pork rice"]=["Cook the rice for 12 minutes.","Fry the pork in cornflour for 6 minutes until crisp.","Add the peppers and pineapple for 3 minutes, then the sweet and sour sauce.","Serve over the rice."];
+METHODS["Cajun salmon and rice"]=["Cook the rice for 12 minutes.","Rub the salmon with Cajun seasoning and air-fry at 200C for 8 minutes.","Fluff the rice with lime juice and chopped red onion.","Serve the salmon on the rice."];
+METHODS["Chicken biryani-style rice"]=["Mix the chicken with the biryani paste and yoghurt for 5 minutes.","Fry the chicken and onion for 8 minutes.","Stir in the rice with 350 ml water and the peas. Simmer covered 15 minutes.","Rest 5 minutes, then fluff and serve."];
+METHODS["Teriyaki beef rice bowls"]=["Cook the rice for 12 minutes.","Stir-fry the beef in a hot pan for 3 minutes, then add the teriyaki sauce.","Wilt the pak choi for 2 minutes.","Build bowls and top with spring onions."];
+METHODS["Turkey and sweetcorn chilli rice"]=["Cook the rice for 12 minutes.","Brown the turkey mince for 6 minutes with the chilli powder.","Add the tomatoes, beans and sweetcorn and simmer 8 minutes.","Serve over the rice."];
+METHODS["Ham fried rice"]=["Cook the rice for 12 minutes and cool it.","Scramble the eggs in a hot pan, then add the ham and peas for 3 minutes.","Add the rice and soy sauce and stir-fry 4 minutes.","Serve hot."];
+METHODS["Chicken yakitori rice"]=["Cook the rice for 12 minutes.","Fry the chicken for 8 minutes, then add the yakitori sauce and cook 2 minutes.","Slice the spring onions.","Serve the chicken over the rice, sprinkled with sesame seeds and onions."];
+METHODS["Prawn and coconut curry rice"]=["Cook the rice for 12 minutes.","Fry the curry paste for 1 minute, then add the coconut milk and simmer 5 minutes.","Add the prawns for 3 minutes until pink, then the spinach until wilted.","Serve with the rice and lime wedges."];
+METHODS["Sausage and pea rice pilaf"]=["Fry the sausages for 6 minutes, breaking them up, with the onion.","Stir in the rice, stock and herbs. Simmer covered 15 minutes.","Add the peas for the last 3 minutes.","Fluff and serve."];
+METHODS["Chicken and chorizo rice"]=["Fry the chorizo for 3 minutes, then the chicken for 6 minutes.","Add the peppers, rice, stock and paprika.","Simmer covered for 15 minutes until the rice is tender.","Rest 2 minutes and serve."];
+METHODS["Chicken and mushroom risotto"]=["Fry the chicken for 6 minutes, then set aside.","Fry the onion and mushrooms for 5 minutes, then add the rice and toast 1 minute.","Add the stock a ladle at a time, stirring, for 18 minutes until creamy.","Stir in the chicken, butter and parmesan. Serve."];
+METHODS["Lemon and pea rice with cod"]=["Cook the rice for 12 minutes, adding the peas for the last 2.","Air-fry the cod at 190C for 10 minutes until flaky.","Stir the lemon zest, butter and dill into the rice.","Serve the cod on the rice."];
+METHODS["Lamb rice bowls with cucumber yoghurt"]=["Cook the rice for 12 minutes.","Fry the lamb mince with cumin for 8 minutes until browned.","Mix the yoghurt with diced cucumber and chopped mint.","Build bowls with rice, lamb and the yoghurt."];
+METHODS["Chicken and pepper rice"]=["Fry the chicken for 6 minutes.","Add the peppers and paprika for 4 minutes.","Stir in the rice and stock, then simmer covered 15 minutes.","Fluff and serve."];
+METHODS["Chilli garlic prawn rice"]=["Cook the rice for 12 minutes.","Fry the garlic and chillies for 1 minute.","Add the prawns for 3 minutes until pink.","Serve over the rice with lime and spring onions."];
+METHODS["Thai red chicken rice"]=["Cook the rice for 12 minutes.","Fry the curry paste for 1 minute, then the chicken for 6 minutes.","Add the coconut milk and simmer 5 minutes, then the spinach.","Serve on the rice with lime."];
+METHODS["Sausage and egg fried rice"]=["Cook the rice for 12 minutes and cool it.","Fry the sausages for 6 minutes, breaking them up, then add the peas.","Push aside, scramble the eggs, then add the rice and soy sauce.","Stir-fry 4 minutes and serve."];
+METHODS["Chicken and leek rice bowls"]=["Cook the rice for 12 minutes.","Fry the chicken for 6 minutes, then add the sliced leeks for 4 minutes.","Stir in the stock, cream and thyme, and simmer 3 minutes.","Serve over the rice."];
+METHODS["Lemon garlic prawn bowls"]=["Cook the rice for 12 minutes.","Fry the garlic in butter for 1 minute, then the prawns for 3 minutes.","Add the spinach and lemon juice until wilted.","Serve over the rice."];
+METHODS["Ham and pea risotto-style rice"]=["Fry the onion for 4 minutes, then add the rice and toast 1 minute.","Add the stock a ladle at a time for 15 minutes, stirring.","Stir in the ham, peas and parmesan.","Rest 2 minutes and serve."];
+METHODS["Lemon and garlic chicken with rice"]=["Cook the rice for 12 minutes.","Fry the chicken for 8 minutes with the garlic and lemon.","Wilt the spinach in the pan for 1 minute.","Serve the chicken and spinach on the rice."];
+METHODS["Chicken parm bites with wedges"]=["Cut the potatoes into wedges and air-fry at 200C for 15 minutes.","Coat the chicken in beaten egg, then panko. Air-fry 10 minutes until cooked.","Top each bite with passata and mozzarella and air-fry 2 minutes to melt.","Serve with the wedges."];
+METHODS["Chicken and potato curry"]=["Boil the potatoes in chunks for 8 minutes until nearly tender.","Fry the onion and curry paste for 4 minutes, then add the chicken for 6 minutes.","Add the potatoes, coconut milk and spinach and simmer 10 minutes.","Serve hot."];
+METHODS["Chicken and garlic crispy potatoes"]=["Halve the baby potatoes and toss with oil, garlic powder and paprika.","Air-fry the potatoes at 200C for 12 minutes, shaking halfway.","Add the chicken thighs and cook 12 minutes more until cooked through.","Serve straight from the basket."];
+METHODS["Chicken katsu wedges"]=["Cut the potatoes into wedges and air-fry at 200C for 15 minutes.","Coat the chicken in flour, egg and panko, then air-fry 10 minutes.","Slice the chicken and serve with the wedges and katsu sauce."];
+METHODS["Crispy cod and chips (air fryer)"]=["Cut the potatoes into chips and air-fry at 200C for 15 minutes.","Dip the cod in flour, beaten egg and breadcrumbs.","Air-fry the cod at 200C for 10 minutes until golden and flaky.","Serve with the chips and tartare sauce."];
+METHODS["Sausage and pepper hash"]=["Boil the potatoes in cubes for 6 minutes, then drain.","Fry the sausages for 6 minutes, then add the onion and peppers for 6 minutes.","Add the potatoes and paprika and fry until crisp, about 5 minutes.","Make four gaps, crack in eggs and cover until set."];
+METHODS["Bacon and potato hash with eggs"]=["Boil the potatoes in cubes for 6 minutes, then drain.","Fry the bacon for 5 minutes, then add the onion and potatoes for 10 minutes.","Make four gaps, crack in eggs and cover until set, about 4 minutes.","Scatter with grated cheddar and serve."];
+METHODS["Steak and chips (air fryer)"]=["Cut the potatoes into chips, toss with rapeseed oil, and air-fry at 200C for 15 minutes.","Rub the steaks with oil and season well.","Air-fry the steaks for 8 minutes, turning once, then rest 3 minutes.","Serve with chips and a spoon of garlic butter on the steak."];
+METHODS["Crispy chicken and smashed potatoes"]=["Boil the baby potatoes for 10 minutes, then drain.","Smash them, toss in oil, rosemary and garlic, and air-fry at 200C for 12 minutes.","Air-fry the chicken breast for 12 minutes until cooked through.","Slice the chicken and serve with the potatoes."];
+METHODS["Pork schnitzel with mash"]=["Boil the potatoes for 12 minutes, then mash with butter and milk.","Flatten the pork, dip in flour, egg and panko.","Fry the pork for 3 minutes each side until golden and cooked.","Serve the schnitzel with the mash."];
+METHODS["Ham and cheese rosti"]=["Grate the potatoes and squeeze out the water.","Mix with egg, butter and seasoning, then press into a hot pan.","Cook 8 minutes until golden, then flip.","Top with ham and cheddar, cover and cook 5 minutes more."];
+METHODS["Chilli stuffed jacket potatoes"]=["Prick the potatoes and air-fry at 200C for 20 minutes until soft.","Brown the beef mince for 6 minutes, then add the beans, tomatoes and chilli powder for 8 minutes.","Split the potatoes and spoon in the chilli.","Top with grated cheddar."];
+METHODS["Honey mustard salmon with new potatoes"]=["Halve the baby potatoes and air-fry at 200C for 12 minutes.","Mix the mustard, honey and oil and brush over the salmon.","Add the salmon to the basket and cook 8 minutes until flaky.","Serve the salmon with the potatoes."];
+METHODS["Chicken chorizo potato hash"]=["Boil the potatoes in cubes for 6 minutes, then drain.","Fry the chicken and chorizo for 8 minutes.","Add the potatoes and peppers and fry until crisp, about 8 minutes.","Serve hot."];
+METHODS["Beef meatballs and mash"]=["Boil the potatoes for 12 minutes, then mash with butter and milk.","Mix the beef mince, breadcrumbs and egg, and roll into balls.","Fry the meatballs for 10 minutes, turning, until cooked.","Make a quick gravy with the stock cube and serve over the mash."];
+METHODS["Sausage and red onion air-fried potatoes"]=["Halve the potatoes and toss with oil and mustard.","Air-fry the potatoes at 200C for 10 minutes, shaking halfway.","Add the sausages and sliced red onion and cook 12 minutes more.","Serve hot."];
+METHODS["Prawn and potato tortilla"]=["Boil the potatoes in cubes for 6 minutes, then drain.","Fry the potatoes for 6 minutes, then add the garlic and prawns for 3 minutes.","Beat the eggs and pour over, then cook covered for 6 minutes.","Flip or finish under the grill and serve in wedges."];
+METHODS["Chicken and bacon potato cakes"]=["Grate the potatoes and squeeze out the water.","Mix with the chicken mince, chopped bacon, egg and flour.","Shape into cakes and fry 4 minutes each side until golden and cooked.","Serve hot."];
+METHODS["Turkey burgers with fries (air fryer)"]=["Cut the potatoes into fries and air-fry at 200C for 15 minutes.","Shape the turkey mince with the burger seasoning into patties.","Air-fry the patties 10 minutes, topping with cheese for the last minute.","Serve in a bun or with the fries."];
+METHODS["Sausage, egg and bean fry-up"]=["Boil the potatoes in cubes for 6 minutes, then fry until golden.","Fry the sausages and bacon for 8 minutes.","Warm the beans in a pan for 3 minutes.","Fry the eggs and serve everything together."];
+METHODS["Steak and mushroom mash"]=["Boil the potatoes for 12 minutes, then mash with butter and milk.","Sear the steaks 2 to 3 minutes each side, then rest.","Fry the mushrooms in the same pan for 4 minutes with the stock cube.","Serve the steak and mushrooms on the mash."];
+METHODS["Salmon fish cakes (air fryer)"]=["Boil the potatoes for 12 minutes, then mash.","Mix in the flaked cooked salmon, egg, dill and lemon zest.","Shape into cakes, coat in breadcrumbs, and air-fry at 200C for 12 minutes.","Serve with lemon wedges."];
+METHODS["Chicken nuggets and chips"]=["Cut the potatoes into chips and air-fry at 200C for 15 minutes.","Cut the chicken into bites, coat in flour, egg and panko.","Air-fry the nuggets at 200C for 10 minutes until golden and cooked.","Serve with the chips."];
+METHODS["Chicken and leek mash bowl"]=["Boil the potatoes for 12 minutes, then mash with butter and milk.","Fry the chicken for 6 minutes, then add the sliced leeks for 4 minutes.","Stir in the stock and cream and simmer 3 minutes.","Serve the chicken over the mash."];
+METHODS["Chicken brioche burgers"]=["Season and shape the chicken mince into patties.","Fry the patties for 5 minutes each side until cooked through.","Toast the brioche buns in the pan for 1 minute.","Build with mayonnaise, lettuce, tomato and cheese."];
+METHODS["Pork and apple brioche burgers"]=["Mix the pork mince with grated apple and sage, and shape into patties.","Fry the patties for 5 minutes each side until cooked through.","Toast the buns and slice the red onion.","Build with mayonnaise and onion."];
+METHODS["Chicken Caesar wraps"]=["Fry the chicken for 6 minutes until cooked, then slice.","Warm the tortillas in a dry pan for 30 seconds each.","Add shredded lettuce, Caesar dressing, chicken and parmesan.","Roll up tightly and cut in half."];
+METHODS["Steak and pepper fajita wraps"]=["Toss the sliced steak in fajita seasoning and fry for 3 minutes, then set aside.","Fry the peppers and onion for 5 minutes.","Warm the tortillas and spread with soured cream.","Fill with steak and vegetables and roll up."];
+METHODS["Cajun prawn baguettes"]=["Toss the prawns in Cajun spice and flour.","Fry the prawns for 2 to 3 minutes until pink.","Split the baguettes and spread with mayonnaise.","Fill with lettuce and prawns."];
+METHODS["Ham and cheese toasties"]=["Spread the bread with butter and mustard.","Layer ham and cheddar between two slices.","Fry in a dry pan for 3 minutes each side until golden and melted.","Cut in half and serve."];
+METHODS["Chorizo and egg ciabatta"]=["Fry the sliced chorizo for 3 minutes until its oil releases.","Beat the eggs and cook in the pan with the chorizo for 2 minutes.","Split the ciabatta and layer on the mozzarella and egg.","Air-fry at 180C for 4 minutes until warm, then add basil."];
+METHODS["Chicken schnitzel burgers"]=["Flatten the chicken and coat in flour, egg and panko.","Fry 4 minutes each side until golden and cooked.","Toast the brioche buns.","Build with coleslaw, mayonnaise and the schnitzel."];
+METHODS["Tuna melts"]=["Mix the drained tuna with mayonnaise and sweetcorn.","Spread the mixture on a slice of bread and top with cheddar.","Cover with a second slice and fry 3 minutes each side until golden.","Cut in half and serve."];
+METHODS["Lamb kofta pittas"]=["Mix the lamb mince with cumin and seasoning, and shape into sausages.","Fry the kofta for 8 minutes, turning, until cooked.","Warm the pittas for 1 minute.","Fill with the kofta, yoghurt, cucumber and mint."];
+METHODS["Steak sandwiches"]=["Fry the mushrooms and red onion for 6 minutes.","Sear the steak 2 to 3 minutes each side, then rest and slice.","Toast the ciabatta and spread with mustard.","Fill with steak, onion, mushrooms and rocket."];
+METHODS["Sausage rolls (air fryer)"]=["Cut the pastry in half lengthways.","Remove the sausage meat from the skins, spread along the pastry and roll up.","Cut into pieces, brush with beaten egg and air-fry at 180C for 12 minutes.","Serve warm with mustard."];
+METHODS["Chicken quesadillas"]=["Fry the chicken for 6 minutes, then shred.","Fry the peppers for 3 minutes.","Layer the tortilla with chicken, peppers and cheddar, then fold.","Fry 2 minutes each side until golden and melted. Serve with salsa."];
+METHODS["Ham and cheese panini (air fryer)"]=["Split the ciabatta and layer ham, mozzarella and tomato.","Brush the outside with oil.","Air-fry at 180C for 5 minutes until golden and melted.","Add basil and serve."];
+METHODS["Beef meatball subs"]=["Mix the beef mince with breadcrumbs and egg and roll into balls.","Fry the meatballs for 8 minutes until cooked.","Warm the passata and add the meatballs for 5 minutes.","Fill the rolls with meatballs and mozzarella, and melt under the grill or in the air fryer for 3 minutes."];
+METHODS["Fish finger sandwiches"]=["Air-fry the fish fingers at 200C for 10 minutes.","Split the bread rolls and spread with tartare sauce.","Mix the coleslaw.","Fill the rolls with fish fingers and coleslaw."];
+METHODS["Chicken and bacon club wraps"]=["Fry the chicken and bacon for 8 minutes until cooked.","Warm the tortillas for 30 seconds each.","Layer lettuce, tomato, mayonnaise, chicken and bacon.","Roll up tightly and cut in half."];
+METHODS["Sausage and onion baguettes"]=["Air-fry the sausages at 190C for 12 minutes, turning halfway.","Split the baguettes and add sliced onion.","Place a sausage in each baguette.","Serve with mustard and ketchup."];
+METHODS["Prawn and avocado tacos"]=["Toss the prawns in a little oil and chilli, and fry for 3 minutes.","Warm the tortillas in a dry pan.","Mash the avocado with lime and coriander.","Fill the tortillas with prawns and avocado."];
+METHODS["Turkey and cranberry toasties"]=["Layer turkey slices and cheddar on a slice of bread.","Spread cranberry sauce on another slice and press together.","Fry 3 minutes each side until golden and melted.","Cut in half and serve."];
+METHODS["Beef French dip baguettes"]=["Brown the sliced onions for 8 minutes.","Sear the beef for 2 minutes each side, then slice thinly.","Simmer the stock cubes in 300 ml water for 3 minutes for dipping.","Fill the baguettes with beef, onions and cheese and serve with the dip."];
+METHODS["Bacon and egg breakfast rolls"]=["Air-fry the bacon at 200C for 8 minutes.","Split the rolls and place an egg in each.","Air-fry at 180C for 5 minutes until the egg is set.","Add the bacon and cheddar, then close the roll."];
+METHODS["Chicken and mushroom tagliatelle"]=["Cook the tagliatelle for 8 minutes and drain.","Fry the chicken for 6 minutes, then add the mushrooms and garlic for 4 minutes.","Pour in the cream and parmesan and simmer 2 minutes.","Toss the pasta through and serve."];
+METHODS["Sausage and spinach orecchiette"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, snip the sausages out of their skins and break them into small pieces.","Add the orecchiette to the boiling water and cook for 10 minutes, stirring once.","While the pasta cooks, fry the sausage in a little oil for 6 minutes until browned all over.","Add the sliced garlic and chilli flakes for 1 minute, then the spinach, stirring until wilted.","Save a cup of the pasta water, then drain the orecchiette.","Toss the pasta into the sausage pan with a splash of pasta water and the parmesan. Serve."];
+METHODS["Bacon, pea and cream fusilli"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, chop the bacon into small strips.","Add the fusilli to the water and cook for 10 minutes. Add the peas for the last 2 minutes.","While the pasta cooks, fry the bacon in a dry pan for 5 minutes until crisp.","Pour the cream into the bacon pan and simmer for 2 minutes. Stir in the parmesan.","Drain the pasta and peas, keeping a splash of water.","Toss everything together in the pan with the sauce and serve."];
+METHODS["Garlic chilli prawn linguine"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, peel and slice the garlic and chilli, and zest and juice the lemon.","Add the linguine to the water and cook for 9 minutes.","While the pasta cooks, heat the oil in a frying pan and fry the garlic and chilli for 1 minute.","Add the prawns to the pan and cook 2 to 3 minutes until pink all through.","Drain the pasta, keeping a cup of the water.","Toss the linguine into the prawn pan with the lemon juice and zest and a splash of water. Serve."];
+METHODS["Quick beef ragu tagliatelle"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, finely chop the onion and carrot.","In a hot pan, brown the beef mince for 5 minutes, breaking it up with a spoon.","Add the onion and carrot to the beef and cook for 5 minutes until soft.","Stir in the tomato purée and crumbled stock cube, then the tomatoes. Simmer for 12 minutes.","Cook the tagliatelle for 8 minutes, then drain.","Toss the tagliatelle in the ragu and serve."];
+METHODS["Smoked salmon and dill linguine"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, pat the salmon fillets dry and season them.","Add the fusilli to the water and cook for 10 minutes.","While the pasta cooks, pan-fry the salmon for 4 minutes on each side, then flake it.","In a separate small pan, warm the crème fraîche and lemon zest over low heat.","Drain the pasta, keeping a splash of water.","Toss the pasta, salmon and chopped dill through the sauce. Serve."];
+METHODS["Cajun chicken penne"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, slice the chicken and the red pepper, and crush the garlic.","Add the penne to the water and cook for 10 minutes.","While the pasta cooks, toss the chicken in Cajun seasoning and fry for 6 minutes until cooked through.","Add the pepper and garlic to the pan for 3 minutes.","Stir in the double cream and simmer for 3 minutes.","Drain the penne, toss through the sauce and serve."];
+METHODS["Pepperoni and mozzarella rigatoni"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, slice the pepperoni and crush the garlic.","Add the rigatoni to the water and cook for 11 minutes.","While the pasta cooks, fry the pepperoni for 2 minutes until its oil releases.","Add the garlic and tomatoes and simmer for 5 minutes.","Drain the pasta and tear the mozzarella into pieces.","Toss the pasta through the sauce, scatter the mozzarella and serve when melting."];
+METHODS["Chicken tikka penne"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, cut the chicken into bite-sized pieces and chop the onion.","Add the penne to the water and cook for 10 minutes.","While the pasta cooks, fry the chicken with the tikka paste for 6 minutes.","Add the onion to the pan for 3 minutes until soft.","Stir in the yoghurt and spinach until the spinach wilts.","Drain the penne, toss through the sauce and serve."];
+METHODS["Ham and leek carbonara"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, slice the leek thinly and tear up the ham.","Add the spaghetti to the water and cook for 10 minutes. Reserve a cup of the water.","While the pasta cooks, fry the leek in a little butter for 5 minutes, then add the ham and garlic.","Whisk the eggs with the parmesan in a bowl.","Drain the spaghetti and tip it into the pan off the heat.","Pour in the egg mixture, toss quickly, add pasta water to loosen, and serve straight away."];
+METHODS["Cheeseburger macaroni"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, chop the onion and slice the gherkins.","Add the macaroni to the water and cook for 8 minutes.","While the pasta cooks, brown the beef mince with the onion for 6 minutes.","Stir in the passata and simmer for 5 minutes, then melt in the cheddar.","Drain the macaroni and toss through the sauce.","Top with the gherkins and serve."];
+METHODS["Tuna and sweetcorn fusilli"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, drain the tuna and sweetcorn and crush the garlic.","Add the fusilli to the water and cook for 10 minutes.","While the pasta cooks, fry the garlic for 1 minute, then add the tomatoes and simmer for 5 minutes.","Stir in the tuna and sweetcorn for 2 minutes.","Drain the pasta and toss through the sauce.","Finish with a squeeze of lemon juice and serve."];
+METHODS["Chorizo and chickpea pasta"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, slice the chorizo and drain and rinse the chickpeas.","Add the pasta to the water and cook for 10 minutes.","While the pasta cooks, fry the chorizo for 3 minutes until its oil releases.","Add the garlic, chickpeas and tomatoes and simmer for 5 minutes.","Stir in the spinach until wilted, then drain the pasta.","Toss the pasta through the sauce and serve."];
+METHODS["Lemon chicken orzo with feta"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, cut the chicken thighs into chunks and zest and juice the lemon.","Add the orzo to the water and cook for 10 minutes.","While the orzo cooks, fry the chicken for 8 minutes until cooked through.","Add the garlic, lemon zest and spinach for 1 to 2 minutes.","Drain the orzo and toss with the chicken and lemon juice.","Crumble the feta on top and serve with lemon wedges."];
+METHODS["Turkey bolognese spaghetti"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, finely chop the onion and crush the garlic.","Add the spaghetti to the water and cook for 10 minutes.","While the pasta cooks, brown the turkey mince for 6 minutes, breaking it up.","Add the onion and garlic and cook for 4 minutes.","Stir in the chopped tomatoes and tomato purée and simmer for 10 minutes.","Drain the spaghetti, toss with the sauce and serve."];
+METHODS["Chicken and bacon alfredo"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, slice the chicken and chop the bacon, and crush the garlic.","Add the fettuccine to the water and cook for 10 minutes. Reserve a cup of the water.","While the pasta cooks, fry the chicken and bacon for 8 minutes until golden.","Add the garlic for 1 minute, then pour in the cream and stir in the parmesan.","Simmer the sauce for 3 minutes.","Drain the fettuccine, toss through the sauce, loosening with water if needed."];
+METHODS["Cajun prawn penne"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, slice the red pepper and spring onions.","Add the penne to the water and cook for 10 minutes.","While the pasta cooks, toss the prawns in Cajun seasoning and fry for 2 minutes.","Add the pepper to the pan for 3 minutes.","Pour in the double cream and simmer for 2 minutes.","Drain the penne, toss through the sauce and top with spring onions."];
+METHODS["Smoked salmon and lemon linguine"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, zest and juice the lemon and chop the dill.","Add the linguine to the water and cook for 9 minutes.","While the pasta cooks, warm the crème fraîche and lemon zest in a pan on low heat.","Drain the linguine, keeping a splash of water.","Tear the smoked salmon into pieces and fold through off the heat with the dill.","Toss the pasta through the sauce with lemon juice and serve."];
+METHODS["Chicken, chorizo and sun-dried tomato fusilli"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, slice the chicken and the chorizo, and chop the sun-dried tomatoes.","Add the fusilli to the water and cook for 10 minutes.","While the pasta cooks, fry the chicken and chorizo for 8 minutes.","Add the sun-dried tomatoes and cream and simmer for 2 minutes.","Stir in the spinach until wilted.","Drain the pasta, toss through the sauce and serve."];
+METHODS["Beef stroganoff tagliatelle"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, slice the beef into strips and the mushrooms and onion thinly.","Add the tagliatelle to the water and cook for 8 minutes.","While the pasta cooks, sear the beef strips in a hot pan for 2 minutes, then set aside.","Fry the onion and mushrooms for 6 minutes, then add the stock cube and mustard.","Stir in the soured cream and return the beef to the pan.","Drain the tagliatelle and toss with the stroganoff sauce."];
+METHODS["Sausage and pepper rigatoni"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, slice the sausages into chunks and the peppers into strips.","Add the rigatoni to the water and cook for 11 minutes.","While the pasta cooks, fry the sausage for 6 minutes until browned.","Add the peppers and garlic for 4 minutes, then the passata.","Simmer for 5 minutes, then drain the rigatoni.","Toss the pasta through the sauce and scatter with torn mozzarella."];
+METHODS["Chicken Caesar penne"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, season and slice the chicken, and shred the lettuce.","Add the penne to the water and cook for 10 minutes.","While the pasta cooks, fry the chicken for 6 minutes until cooked through.","Drain the penne and toss with the Caesar dressing and lettuce.","Top with the sliced chicken.","Finish with grated parmesan and serve."];
+METHODS["Spicy sausage arrabbiata"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, slice the sausages and crush the garlic.","Add the penne to the water and cook for 10 minutes.","While the pasta cooks, fry the sausage for 6 minutes, breaking it up.","Add the garlic, chilli flakes and tomatoes and simmer for 8 minutes.","Drain the penne and toss through the sauce.","Serve with parmesan."];
+METHODS["Prawn and pesto penne"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, halve the cherry tomatoes and check the pesto label is nut-free.","Add the penne to the water and cook for 10 minutes.","While the pasta cooks, fry the prawns for 2 to 3 minutes until pink.","Add the tomatoes and spinach to the pan for 2 minutes until the spinach wilts.","Drain the penne, keeping a splash of water.","Toss the penne with the pesto, prawns and vegetables, loosening with water. Serve."];
+METHODS["Beef chilli macaroni"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, chop the onion and drain and rinse the kidney beans.","Add the macaroni to the water and cook for 8 minutes.","While the pasta cooks, brown the beef mince with the onion for 6 minutes.","Add the chilli powder, tomatoes and beans and simmer for 10 minutes.","Drain the macaroni and stir it into the chilli.","Melt the cheddar through and serve."];
+METHODS["Garlic mushroom and steak gnocchi"]=["Slice the steak thinly and the mushrooms, and chop the parsley and garlic.","Fry the gnocchi in half the butter for 6 minutes until golden, then set aside.","While the gnocchi fries, sear the steak for 2 minutes each side, then rest it.","In the same pan, cook the mushrooms in the remaining butter for 4 minutes.","Add the garlic for 1 minute, then return the gnocchi and steak to the pan.","Toss everything together for 1 minute.","Scatter with parsley and serve."];
+METHODS["Sausage and bean penne"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, slice the sausages and chop the onion.","Add the penne to the water and cook for 10 minutes.","While the pasta cooks, fry the sausages and onion for 6 minutes.","Add the tomatoes, beans and herbs and simmer for 6 minutes.","Drain the penne and toss through the sauce.","Serve hot."];
+METHODS["Chicken and sun-dried tomato gnocchi"]=["Slice the chicken, chop the sun-dried tomatoes, and wash the spinach.","Fry the gnocchi in a little oil for 5 minutes until golden, then set aside.","While the gnocchi crisps, fry the chicken for 6 minutes.","Add the sun-dried tomatoes to the chicken for 1 minute.","Stir in the cream and parmesan, then the spinach until wilted.","Return the gnocchi to the pan and toss through.","Serve straight away."];
+METHODS["Beef bolognese with penne"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, crush the garlic.","Add the penne to the water and cook for 10 minutes.","While the pasta cooks, brown the beef mince with the garlic for 6 minutes.","Add the passata and simmer for 10 minutes.","Drain the penne and toss it through the sauce.","Top with parmesan and serve."];
+METHODS["Chicken and mushroom tagliatelle"]=["Fill a large pan with salted water and bring it to the boil.","While the water heats, slice the chicken and the mushrooms, and crush the garlic.","Add the tagliatelle to the water and cook for 8 minutes.","While the pasta cooks, fry the chicken for 6 minutes until cooked through.","Add the mushrooms and garlic for 4 minutes until golden.","Pour in the cream and parmesan and simmer for 2 minutes.","Drain the tagliatelle and toss through the sauce. Serve."];
+METHODS["Pizza night"]=["Heat the air fryer to 200C.","While it heats, wash the salad and make the garlic dip ready to serve.","Put the pizzas in the air fryer and cook for 8 to 10 minutes until bubbling.","Check the cheese is melted and the base is crisp.","Toss the salad while the pizza rests for 2 minutes.","Slice and serve with the salad and garlic dip."];
+METHODS["Chicken fried rice"]=["Rinse the rice, then boil it in a pan of water for 12 minutes. Drain and spread on a tray to cool.","While the rice cooks, slice the spring onions and crack the eggs into a bowl.","Cut the chicken into small pieces and fry in a hot wok for 6 minutes until cooked.","Push the chicken aside, scramble the eggs in the wok for 1 minute.","Add the rice, peas and soy sauce and stir-fry for 4 minutes.","Stir in the spring onions and serve."];
+METHODS["Chicken katsu bites with rice"]=["Rinse the rice and cook it in boiling water for 12 minutes.","While the rice cooks, cut the chicken into bite-sized pieces.","Set up three bowls: flour, beaten egg and panko. Coat each chicken bite in all three.","Air-fry at 200C for 12 minutes, turning halfway, until crisp and cooked through.","Drain and fluff the rice.","Serve the chicken on the rice with katsu sauce drizzled over."];
+METHODS["Beef and broccoli rice stir-fry"]=["Rinse the rice and cook it in boiling water for 12 minutes.","While the rice cooks, slice the beef thinly and toss with the cornflour.","Crush the garlic and cut the broccoli into small florets.","Stir-fry the beef in a very hot pan for 3 minutes, then set aside.","Add the broccoli and garlic for 3 minutes, then return the beef.","Stir in the oyster and soy sauces, then spoon over the rice."];
+METHODS["Sweet chilli salmon with rice"]=["Rinse the rice and cook it in boiling water for 12 minutes.","While the rice cooks, pat the salmon fillets dry and place them in the air fryer basket.","Brush the salmon with sweet chilli sauce.","Air-fry at 200C for 8 minutes until the salmon flakes easily.","Fluff the rice with a squeeze of lime juice.","Slice the spring onions and scatter them over the salmon. Serve on the rice."];
+METHODS["Chorizo and prawn rice"]=["Slice the chorizo, chop the red pepper and measure out the stock.","Fry the chorizo in a dry pan for 3 minutes until its oil releases.","Add the pepper and paprika for 2 minutes, then stir in the rice and stock.","Simmer covered for 15 minutes, stirring once halfway.","While it simmers, peel and devein the prawns.","Add the prawns and peas for the last 4 minutes until pink.","Rest for 2 minutes, then serve."];
+METHODS["Jerk chicken and black bean rice"]=["Rub the chicken thighs all over with jerk seasoning.","Air-fry at 200C for 18 minutes, turning once, until cooked through.","While the chicken cooks, rinse the rice and cook it for 12 minutes.","Drain and warm the black beans in a small pan for 3 minutes.","Cut the lime into wedges.","Serve the chicken on the rice and beans with lime wedges."];
+METHODS["Beef burrito bowls"]=["Rinse the rice and cook it for 12 minutes.","While the rice cooks, brown the beef mince for 6 minutes.","Stir in the taco seasoning and a splash of water and simmer 2 minutes.","Warm the kidney beans and sweetcorn in a small pan for 3 minutes.","Grate the cheddar and open the salsa.","Build bowls with rice, beef, beans, sweetcorn, salsa and cheese."];
+METHODS["Korean chicken rice bowls"]=["Rinse the rice and cook it for 12 minutes.","While the rice cooks, mix the gochujang, soy sauce and honey in a bowl.","Slice the chicken thighs and coat them in the sauce.","Fry the chicken for 8 minutes until cooked and sticky.","Meanwhile, slice the cucumber and spring onions.","Build bowls with rice, chicken, cucumber and spring onions."];
+METHODS["Greek lemon chicken and rice"]=["Rinse the rice and cook it for 12 minutes.","While the rice cooks, slice the chicken and season with lemon zest and oregano.","Fry the chicken for 8 minutes until cooked through.","While it fries, chop the cucumber and tomatoes and crumble the feta.","Fluff the rice and add lemon juice.","Serve the chicken on the rice with the salad and feta."];
+METHODS["Sweet and sour pork rice"]=["Rinse the rice and cook it for 12 minutes.","While the rice cooks, cut the pork into cubes and toss in cornflour.","Fry the pork for 6 minutes until crisp.","Meanwhile, chop the peppers and drain the pineapple.","Add the peppers and pineapple for 3 minutes, then the sweet and sour sauce.","Serve over the rice."];
+METHODS["Cajun salmon and rice"]=["Rinse the rice and cook it for 12 minutes.","While the rice cooks, rub the salmon with Cajun seasoning.","Air-fry at 200C for 8 minutes until flaky.","Finely chop the red onion and squeeze the lime.","Fluff the rice with lime juice and red onion.","Serve the salmon on the rice."];
+METHODS["Chicken biryani-style rice"]=["Cut the chicken into chunks and chop the onion.","Mix the chicken with the biryani paste and yoghurt and leave for 5 minutes.","Fry the onion for 3 minutes, then add the chicken for 8 minutes.","Rinse the rice and stir it into the pan with 350 ml water and the peas.","Cover and simmer for 15 minutes until the rice is tender.","Rest 5 minutes, then fluff and serve."];
+METHODS["Teriyaki beef rice bowls"]=["Rinse the rice and cook it for 12 minutes.","While the rice cooks, slice the beef and chop the spring onions.","Stir-fry the beef in a hot pan for 3 minutes, then add the teriyaki sauce.","Halve the pak choi and wilt it in the pan for 2 minutes.","Spoon the rice into bowls.","Top with beef, pak choi and spring onions."];
+METHODS["Turkey and sweetcorn chilli rice"]=["Rinse the rice and cook it for 12 minutes.","While the rice cooks, brown the turkey mince for 6 minutes.","Stir in the chilli powder and cook 1 minute.","Add the tomatoes, beans and sweetcorn and simmer for 8 minutes.","Fluff the rice.","Serve the chilli over the rice."];
+METHODS["Ham fried rice"]=["Rinse the rice, cook it for 12 minutes, then cool on a tray.","While the rice cooks, chop the ham and crack the eggs into a bowl.","Scramble the eggs in a hot pan for 1 minute, then add the ham and peas for 3 minutes.","Add the cooled rice and soy sauce.","Stir-fry for 4 minutes until hot.","Serve straight away."];
+METHODS["Chicken yakitori rice"]=["Rinse the rice and cook it for 12 minutes.","While the rice cooks, cut the chicken into bite-sized pieces and slice the spring onions.","Fry the chicken for 8 minutes until cooked through.","Add the yakitori sauce and cook 2 minutes until sticky.","Fluff the rice and spoon into bowls.","Top with chicken, spring onions and sesame seeds."];
+METHODS["Prawn and coconut curry rice"]=["Rinse the rice and cook it for 12 minutes.","While the rice cooks, zest and juice the lime and wash the spinach.","Fry the curry paste for 1 minute.","Add the coconut milk and simmer for 5 minutes.","Add the prawns for 3 minutes until pink, then the spinach until wilted.","Finish with lime juice and serve with the rice."];
+METHODS["Sausage and pea rice pilaf"]=["Slice the sausages and chop the onion.","Fry the sausages for 6 minutes, breaking them up, then add the onion for 3 minutes.","Stir in the rice, stock cube, herbs and 500 ml water.","Cover and simmer for 12 minutes.","Add the peas and cook 3 minutes more.","Fluff and serve."];
+METHODS["Chicken and chorizo rice"]=["Slice the chorizo, chicken thighs and peppers.","Fry the chorizo for 3 minutes, then add the chicken for 6 minutes.","Add the peppers for 3 minutes, then the rice, stock and paprika.","Simmer covered for 15 minutes until the rice is tender.","Rest 2 minutes.","Fluff and serve."];
+METHODS["Chicken and mushroom risotto"]=["Slice the chicken and mushrooms, and chop the onion.","Fry the chicken in a little oil for 6 minutes, then set aside.","Fry the onion and mushrooms in the same pan for 5 minutes.","Add the rice and toast for 1 minute.","Add the hot stock a ladle at a time for 18 minutes, stirring until creamy.","Stir in the chicken, butter and parmesan. Rest 2 minutes and serve."];
+METHODS["Lemon and pea rice with cod"]=["Rinse the rice and cook it for 12 minutes, adding the peas for the last 2 minutes.","While the rice cooks, pat the cod dry and season it.","Air-fry the cod at 190C for 10 minutes until flaky.","Zest and juice the lemon and chop the dill.","Stir the lemon zest, butter and dill into the rice.","Serve the cod on the rice with lemon juice."];
+METHODS["Lamb rice bowls with cucumber yoghurt"]=["Rinse the rice and cook it for 12 minutes.","While the rice cooks, dice the cucumber and chop the mint.","Mix the yoghurt with the cucumber and half the mint.","Fry the lamb mince with cumin for 8 minutes until browned.","Fluff the rice and build bowls.","Top with lamb, cucumber yoghurt and the rest of the mint."];
+METHODS["Chicken and pepper rice"]=["Slice the chicken and peppers.","Fry the chicken for 6 minutes until cooked.","Add the peppers and smoked paprika for 4 minutes.","Stir in the rice and stock and bring to the boil.","Cover and simmer for 15 minutes.","Fluff and serve."];
+METHODS["Chilli garlic prawn rice"]=["Rinse the rice and cook it for 12 minutes.","While the rice cooks, slice the chillies, crush the garlic and cut the lime.","Fry the garlic and chillies for 1 minute.","Add the prawns and cook 3 minutes until pink.","Fluff the rice and spoon the prawns on top.","Finish with lime and spring onions."];
+METHODS["Thai red chicken rice"]=["Rinse the rice and cook it for 12 minutes.","While the rice cooks, slice the chicken and wash the spinach.","Fry the red curry paste for 1 minute, then add the chicken for 6 minutes.","Pour in the coconut milk and simmer for 5 minutes.","Stir in the spinach until wilted.","Serve on the rice with lime wedges."];
+METHODS["Sausage and egg fried rice"]=["Rinse the rice, cook for 12 minutes, then cool on a tray.","While the rice cooks, slice the sausages and crack the eggs into a bowl.","Fry the sausages for 6 minutes, breaking them up, then add the peas.","Push aside and scramble the eggs for 1 minute.","Add the rice and soy sauce and stir-fry for 4 minutes.","Serve hot."];
+METHODS["Chicken and leek rice bowls"]=["Rinse the rice and cook it for 12 minutes.","While the rice cooks, slice the chicken and the leeks.","Fry the chicken for 6 minutes, then add the leeks for 4 minutes.","Stir in the stock cube, cream and thyme and simmer for 3 minutes.","Spoon the rice into bowls.","Top with the chicken and creamy leeks."];
+METHODS["Lemon garlic prawn bowls"]=["Rinse the rice and cook it for 12 minutes.","While the rice cooks, crush the garlic, zest and juice the lemon.","Melt the butter in a pan and fry the garlic for 1 minute.","Add the prawns for 3 minutes until pink.","Stir in the spinach and lemon juice until wilted.","Serve over the rice."];
+METHODS["Ham and pea risotto-style rice"]=["Chop the onion and cut the ham into strips.","Fry the onion for 4 minutes, then add the rice and toast for 1 minute.","Add the hot stock a ladle at a time for 15 minutes, stirring.","Stir in the ham and peas for the last 3 minutes.","Remove from the heat and stir in the parmesan.","Rest 2 minutes and serve."];
+METHODS["Lemon and garlic chicken with rice"]=["Rinse the rice and cook it for 12 minutes.","While the rice cooks, slice the chicken and crush the garlic.","Fry the chicken for 8 minutes with the garlic and lemon zest.","Add the spinach to the pan until wilted.","Fluff the rice and squeeze over lemon juice.","Serve the chicken and spinach on the rice."];
+/*MORE*/
+const FIXED_NAMES=["Chicken nuggets and chips","Pizza night"];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function generateWeek(){
+  const cooked=DAYS.filter(d=>S.plan[d]&&S.plan[d].cooked);
+  const open=DAYS.filter(d=>!(S.plan[d]&&S.plan[d].cooked)&&d!=="Fri"&&d!=="Sat");
+  const used=new Set(cooked.map(d=>S.plan[d].recipeId));
+  const carbs={};
+  cooked.forEach(d=>{const r=S.recipes.find(x=>x.id===S.plan[d].recipeId); if(r) carbs[r.carb]=(carbs[r.carb]||0)+1;});
+  const cutoff=new Date(Date.now()-21*864e5).toISOString().slice(0,10);
+  const recent=new Set((S.history||[]).filter(h=>h.date>=cutoff).map(h=>h.recipeId));
+  const basePool=S.recipes.filter(r=>!used.has(r.id)&&r.carb!=="Bread"&&!FIXED_NAMES.includes(r.name));
+  const freshPool=basePool.filter(r=>!recent.has(r.id));
+  const pool=shuffle(freshPool.length>=open.length?freshPool:basePool);
+  if(!pool.length){ note("Add some recipes first."); return; }
+  let filled=0;
+  open.forEach(d=>{
+    const pick=pool.find(r=>!used.has(r.id)&&(carbs[r.carb]||0)<2)||pool.find(r=>!used.has(r.id));
+    if(!pick){ delete S.plan[d]; return; }
+    used.add(pick.id); carbs[pick.carb]=(carbs[pick.carb]||0)+1;
+    S.plan[d]={recipeId:pick.id,cooked:false}; filled++;
+  });
+  [["Fri","Chicken nuggets and chips"],["Sat","Pizza night"]].forEach(([d,name])=>{
+    const r=S.recipes.find(x=>norm(x.name)===norm(name));
+    if(!r||(S.plan[d]&&S.plan[d].cooked)) return;
+    S.plan[d]={recipeId:r.id,cooked:false}; filled++;
+  });
+  note(`Generated ${filled} dinner${filled===1?'':'s'}. Cooked days were left alone.`);
+}
+const FULL_DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+function loadJsPDF(){
+  if(window.jspdf&&window.jspdf.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
+  return new Promise((resolve,reject)=>{
+    const s=document.createElement("script");
+    s.src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+    s.onload=()=>(window.jspdf&&window.jspdf.jsPDF)?resolve(window.jspdf.jsPDF):reject(new Error("PDF library did not load"));
+    s.onerror=()=>reject(new Error("PDF library could not be reached"));
+    document.head.appendChild(s);
+  });
+}
+async function confirmWeekOld(){
+  const days=DAYS.map((d,i)=>({full:FULL_DAYS[i],r:S.recipes.find(x=>x.id===(S.plan[d]||{}).recipeId)})).filter(x=>x.r);
+  if(!days.length){ note("Plan some dinners before confirming the week."); return; }
+  let downloads=null;
+  try{ downloads=window.claude?await window.claude.use("downloads"):null; }catch(e){}
+  if(!downloads){ note("Saving files isn't available in this view."); return; }
+  note("Making your PDF..."); paintStatus();
+  try{
+    const JsPDF=await loadJsPDF();
+    const doc=new JsPDF({unit:"mm",format:"a4"});
+    const W=210, M=14;
+    const header=()=>{
+      doc.setFillColor(47,93,80); doc.rect(0,0,W,34,"F");
+      doc.setTextColor(255,255,255); doc.setFont("helvetica","bold"); doc.setFontSize(20);
+      doc.text("This week's dinners",M,16);
+      doc.setFont("helvetica","normal"); doc.setFontSize(10);
+      doc.text(days.length+" dinners, four people",M,25);
+      doc.setTextColor(29,29,27);
+    };
+    header();
+    let y=44;
+    days.forEach(({full,r})=>{
+      const showNut=r.nut&&r.nut!=="None expected";
+      const lines=r.ingredients.flatMap(i=>doc.splitTextToSize("• "+i.name+": "+i.qty+" "+i.unit,W-2*M-4));
+      const need=20+lines.length*5.2+(showNut?6:0);
+      if(y+need>282){ doc.addPage(); header(); y=44; }
+      doc.setFont("helvetica","bold"); doc.setFontSize(13); doc.text(full,M,y); y+=6;
+      doc.setFontSize(12); doc.text(r.name,M,y); y+=5.5;
+      doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(102,102,102);
+      doc.text((r.prep+r.cook)+" min · "+(r.method||""),M,y); y+=5;
+      doc.setTextColor(29,29,27); doc.setFontSize(10);
+      lines.forEach(l=>{ doc.text(l,M+2,y); y+=5.2; });
+      if(showNut){ doc.setFontSize(8.5); doc.setTextColor(178,74,43); doc.text("Allergy check: "+r.nut,M,y); y+=5; doc.setTextColor(29,29,27); }
+      y+=5;
+    });
+    const blob=doc.output("blob");
+    await downloads.save({filename:"week-menu.pdf",data:blob});
+    note("PDF ready.");
+  }catch(e){
+    note("Couldn't make the PDF: "+(e&&e.message?e.message:"save was cancelled"));
+  }
+}
+function drawIcon(doc,r,cx,cy){
+  doc.setFillColor(255,255,255); doc.circle(cx,cy,15,"F");
+  doc.setFillColor(47,93,80);
+  if(r.carb==="Pasta"){
+    doc.setDrawColor(47,93,80); doc.setLineWidth(0.9);
+    [-5,0,5].forEach(dy=>doc.line(cx-8,cy+dy,cx+8,cy+dy));
+  } else if(r.carb==="Rice"){
+    [[-4,-3],[0,-3],[4,-3],[-2,1],[2,1],[-4,4],[0,4],[4,4]].forEach(([dx,dy])=>doc.circle(cx+dx,cy+dy,1.2,"F"));
+  } else if(r.carb==="Potato"){
+    doc.ellipse(cx,cy,8,6,"F");
+    doc.setFillColor(255,255,255);
+    [[-3,-1],[2,1],[-1,3]].forEach(([dx,dy])=>doc.circle(cx+dx,cy+dy,0.8,"F"));
+  } else if(r.carb==="Bread"){
+    doc.roundedRect(cx-8,cy-5,16,10,4,4,"F");
+  } else {
+    doc.circle(cx,cy,6,"F");
+  }
+}
+async function confirmWeekV2(){
+  const days=DAYS.map((d,i)=>({full:FULL_DAYS[i],r:S.recipes.find(x=>x.id===(S.plan[d]||{}).recipeId)})).filter(x=>x.r);
+  if(!days.length){ note("Plan some dinners before confirming the week."); return; }
+  let downloads=null;
+  try{ downloads=window.claude?await window.claude.use("downloads"):null; }catch(e){}
+  if(!downloads){ note("Saving files isn't available in this view."); return; }
+  note("Making your PDF..."); paintStatus();
+  try{
+    const JsPDF=await loadJsPDF();
+    const doc=new JsPDF({unit:"mm",format:"a4"});
+    const W=210,H=297,M=14;
+    const GREEN=[47,93,80], INK=[29,29,27], CREAM=[250,247,240], ORANGE=[178,74,43];
+    days.forEach(({full,r},idx)=>{
+      if(idx>0) doc.addPage();
+      doc.setFillColor(...CREAM); doc.rect(0,0,W,H,"F");
+      doc.setFillColor(...GREEN); doc.rect(0,0,W,62,"F");
+      doc.setTextColor(255,255,255); doc.setFont("helvetica","normal"); doc.setFontSize(10);
+      doc.text(full.toUpperCase()+"  ·  FOR FOUR",M,14);
+      doc.setFont("helvetica","bold"); doc.setFontSize(22);
+      doc.text(doc.splitTextToSize(r.name,125),M,27);
+      drawIcon(doc,r,W-M-15,36);
+      doc.setFont("helvetica","normal"); doc.setFontSize(10);
+      doc.text((r.prep+r.cook)+" min  ·  "+(r.method||"")+"  ·  "+(r.carb||""),M,56);
+      let y=76;
+      doc.setTextColor(...GREEN); doc.setFont("helvetica","bold"); doc.setFontSize(13);
+      doc.text("Ingredients",M,y); y+=7;
+      doc.setTextColor(...INK); doc.setFont("helvetica","normal"); doc.setFontSize(10);
+      r.ingredients.forEach((i,k)=>{
+        const x=M+(k%2)*92, yy=y+Math.floor(k/2)*6.2;
+        doc.text(doc.splitTextToSize("• "+i.name,64)[0],x,yy);
+        const q=i.unit==="each"?String(i.qty):(i.qty+" "+i.unit);
+        doc.text(q,x+84,yy,{align:"right"});
+      });
+      y+=Math.ceil(r.ingredients.length/2)*6.2+8;
+      doc.setTextColor(...GREEN); doc.setFont("helvetica","bold"); doc.setFontSize(13);
+      doc.text("Method",M,y); y+=7;
+      const steps=r.steps||[];
+      if(!steps.length){ doc.setTextColor(...INK); doc.setFont("helvetica","italic"); doc.setFontSize(10); doc.text("Method coming soon.",M,y); y+=6; }
+      steps.forEach((s,k)=>{
+        const lines=doc.splitTextToSize(s,W-2*M-14);
+        doc.setFillColor(...GREEN); doc.circle(M+3,y-1.3,3,"F");
+        doc.setTextColor(255,255,255); doc.setFont("helvetica","bold"); doc.setFontSize(9);
+        doc.text(String(k+1),M+3,y,{align:"center"});
+        doc.setTextColor(...INK); doc.setFont("helvetica","normal"); doc.setFontSize(10.5);
+        doc.text(lines,M+11,y);
+        y+=lines.length*5.2+3.5;
+      });
+      if(r.nut&&r.nut!=="None expected"){
+        const ny=Math.max(y+4,262);
+        doc.setFillColor(255,255,255); doc.roundedRect(M,ny-5,W-2*M,12,2,2,"F");
+        doc.setTextColor(...ORANGE); doc.setFont("helvetica","bold"); doc.setFontSize(9.5);
+        doc.text("Allergy check: "+r.nut,M+3,ny+2);
+      }
+    });
+    const blob=doc.output("blob");
+    await downloads.save({filename:"week-menu.pdf",data:blob});
+    note("PDF ready.");
+  }catch(e){
+    note("Couldn't make the PDF: "+(e&&e.message?e.message:"save was cancelled"));
+  }
+}
+function stepKind(s){
+  const t=s.toLowerCase();
+  if(/air.?fry|oven|basket/.test(t)) return "basket";
+  if(/drain/.test(t)) return "colander";
+  if(/serve|top |topping|build|fill|sprinkle|scatter|garnish/.test(t)) return "plate";
+  if(/rest|cool|set |leave/.test(t)) return "clock";
+  if(/boil|simmer|water/.test(t)) return "pot";
+  if(/chop|slice|cut|dice|snip|shred|halve|flake|break/.test(t)) return "knife";
+  if(/mix|toss|stir|whisk|beat|combine|coat|mash|rub|season|dip/.test(t)) return "bowl";
+  if(/fry|sear|brown|wilt|crisp|scramble|golden|cook/.test(t)) return "pan";
+  return "spoon";
+}
+function drawStepIcon(doc,kind,cx,cy){
+  const G=[47,93,80], WH=[255,255,255];
+  doc.setFillColor(...G); doc.setDrawColor(...G); doc.setLineWidth(0.3);
+  if(kind==="pot"){
+    doc.roundedRect(cx-9,cy-3,18,11,2,2,"F");
+    doc.rect(cx-12,cy-1,3,2,"F"); doc.rect(cx+9,cy-1,3,2,"F");
+    doc.rect(cx-8,cy-6,16,2,"F");
+    doc.setFillColor(...WH); doc.circle(cx-4,cy+2,1,"F"); doc.circle(cx+3,cy+4,1,"F");
+  } else if(kind==="pan"){
+    doc.circle(cx-2,cy,7,"F"); doc.rect(cx+4,cy-1.5,9,3,"F");
+    doc.setFillColor(...WH); doc.circle(cx-2,cy,4,"F");
+  } else if(kind==="basket"){
+    doc.roundedRect(cx-9,cy-6,18,13,2,2,"F");
+    doc.setFillColor(...WH); [-4,0,4].forEach(dx=>doc.rect(cx+dx-0.4,cy-4,0.8,9,"F"));
+  } else if(kind==="knife"){
+    doc.setLineWidth(2.2); doc.line(cx-7,cy+6,cx+4,cy-5); doc.setLineWidth(0.3);
+    doc.circle(cx+6,cy-7,2.5,"F");
+  } else if(kind==="bowl"){
+    doc.ellipse(cx,cy,10,6,"F");
+    doc.setFillColor(...WH); doc.ellipse(cx,cy-1,6,2.5,"F");
+  } else if(kind==="colander"){
+    doc.ellipse(cx,cy-4,10,3,"F");
+    doc.roundedRect(cx-7,cy-3,14,11,2,2,"F");
+    doc.setFillColor(...WH); [[-3,0],[2,0],[-1,4],[3,4],[-4,4]].forEach(([dx,dy])=>doc.circle(cx+dx,cy+dy,0.9,"F"));
+  } else if(kind==="plate"){
+    doc.circle(cx,cy,10,"F"); doc.setFillColor(...WH); doc.circle(cx,cy,6,"F");
+    doc.setFillColor(...G); doc.circle(cx,cy,3,"F");
+  } else if(kind==="clock"){
+    doc.circle(cx,cy,10,"F"); doc.setFillColor(...WH); doc.circle(cx,cy,8,"F");
+    doc.setDrawColor(...G); doc.setLineWidth(0.9); doc.line(cx,cy,cx,cy-5); doc.line(cx,cy,cx+4,cy);
+  } else {
+    doc.ellipse(cx,cy-4,4,5,"F"); doc.setLineWidth(1.6); doc.line(cx,cy+1,cx,cy+10);
+  }
+  doc.setLineWidth(0.3);
+}
+async function confirmWeekPDF(){
+  const days=DAYS.map((d,i)=>({full:FULL_DAYS[i],r:S.recipes.find(x=>x.id===(S.plan[d]||{}).recipeId)})).filter(x=>x.r);
+  if(!days.length){ note("Plan some dinners before confirming the week."); return; }
+  let downloads=null;
+  try{ downloads=window.claude?await window.claude.use("downloads"):null; }catch(e){}
+  if(!downloads){ note("Saving files isn't available in this view."); return; }
+  note("Making your PDF..."); paintStatus();
+  try{
+    const JsPDF=await loadJsPDF();
+    const doc=new JsPDF({unit:"mm",format:"a4"});
+    const W=210,H=297,M=12;
+    const GREEN=[47,93,80], INK=[29,29,27], CREAM=[250,247,240], ORANGE=[178,74,43];
+    days.forEach(({full,r},idx)=>{
+      if(idx>0) doc.addPage();
+      doc.setFillColor(...CREAM); doc.rect(0,0,W,H,"F");
+      doc.setFillColor(...GREEN); doc.rect(0,0,W,50,"F");
+      doc.setTextColor(255,255,255); doc.setFont("helvetica","normal"); doc.setFontSize(9.5);
+      doc.text(full.toUpperCase()+"  ·  FOR FOUR  ·  "+(r.prep+r.cook)+" MIN",M,12);
+      doc.setFont("helvetica","bold"); doc.setFontSize(22);
+      doc.text(doc.splitTextToSize(r.name,140),M,24);
+      doc.setFont("helvetica","normal"); doc.setFontSize(9.5);
+      doc.text((r.method||"")+"  ·  "+(r.carb||""),M,42);
+      drawIcon(doc,r,W-M-14,30);
+      let y=60;
+      doc.setTextColor(...GREEN); doc.setFont("helvetica","bold"); doc.setFontSize(12);
+      doc.text("Ingredients",M,y); y+=5;
+      const colW=(W-2*M)/2;
+      doc.setTextColor(...INK); doc.setFont("helvetica","normal"); doc.setFontSize(9.5);
+      r.ingredients.forEach((i,k)=>{
+        const x=M+(k%2)*colW, yy=y+Math.floor(k/2)*5.6;
+        doc.text(doc.splitTextToSize("• "+i.name,colW-28)[0],x,yy);
+        const q=i.unit==="each"?String(i.qty):(i.qty+" "+i.unit);
+        doc.text(q,x+colW-4,yy,{align:"right"});
+      });
+      y+=Math.ceil(r.ingredients.length/2)*5.6+7;
+      doc.setTextColor(...GREEN); doc.setFont("helvetica","bold"); doc.setFontSize(12);
+      doc.text("Method",M,y); y+=5;
+      const steps=(r.steps&&r.steps.length)?r.steps:["Method coming soon."];
+      const cellW=(W-2*M-6)/2, cellH=66;
+      steps.forEach((s,k)=>{
+        const x=M+(k%2)*(cellW+6), yy=y+Math.floor(k/2)*(cellH+6);
+        doc.setFillColor(255,255,255); doc.setDrawColor(217,217,212); doc.setLineWidth(0.3);
+        doc.roundedRect(x,yy,cellW,cellH,3,3,"FD");
+        doc.setFillColor(...GREEN); doc.circle(x+7,yy+7,4,"F");
+        doc.setTextColor(255,255,255); doc.setFont("helvetica","bold"); doc.setFontSize(10);
+        doc.text(String(k+1),x+7,yy+8.4,{align:"center"});
+        drawStepIcon(doc,stepKind(s),x+cellW/2,yy+24);
+        doc.setTextColor(...INK); doc.setFont("helvetica","normal"); doc.setFontSize(9.5);
+        doc.text(doc.splitTextToSize(s,cellW-8).slice(0,6),x+4,yy+40);
+      });
+      if(r.nut&&r.nut!=="None expected"){
+        doc.setTextColor(...ORANGE); doc.setFont("helvetica","bold"); doc.setFontSize(9.5);
+        doc.text("Allergy check: "+r.nut,M,268);
+      }
+    });
+    const blob=doc.output("blob");
+    await downloads.save({filename:"week-menu.pdf",data:blob});
+    note("PDF ready.");
+  }catch(e){
+    note("Couldn't make the PDF: "+(e&&e.message?e.message:"save was cancelled"));
+  }
+}
+const ICONS={
+  pot:'<rect x="12" y="26" width="40" height="26" rx="6"/><rect x="8" y="21" width="48" height="6" rx="3"/><path d="M4 33h6M54 33h6"/><path d="M22 14c-3-3 3-5 0-9M32 14c-3-3 3-5 0-9M42 14c-3-3 3-5 0-9"/>',
+  pan:'<circle cx="28" cy="34" r="16"/><circle cx="28" cy="34" r="9"/><path d="M44 30 58 24"/>',
+  basket:'<rect x="10" y="16" width="44" height="32" rx="6"/><path d="M19 24v16M28 24v16M37 24v16M46 24v16"/><path d="M16 52h32"/>',
+  knife:'<path d="M12 52 44 20l8 8-32 32z"/><path d="M44 20l6-6 8 8-6 6"/>',
+  bowl:'<path d="M8 28h48c0 14-10 24-24 24S8 42 8 28z"/><path d="M20 58h24"/>',
+  colander:'<path d="M10 22h44l-7 30H17z"/><path d="M6 22h52"/><circle cx="24" cy="34" r="2"/><circle cx="32" cy="34" r="2"/><circle cx="40" cy="34" r="2"/><circle cx="28" cy="43" r="2"/><circle cx="36" cy="43" r="2"/>',
+  plate:'<circle cx="32" cy="32" r="22"/><circle cx="32" cy="32" r="13"/>',
+  clock:'<circle cx="32" cy="32" r="22"/><path d="M32 18v14l9 6"/>',
+  spoon:'<ellipse cx="32" cy="22" rx="10" ry="12"/><path d="M32 34v24"/>'
+};
+function iconSvg(kind){ return `<svg viewBox="0 0 64 64" class="ic-svg" aria-hidden="true">${ICONS[kind]||ICONS.spoon}</svg>`; }
+const MENU_CSS=`@page{size:A4;margin:12mm}
+body{font-family:Arial,Helvetica,sans-serif;color:#1d1d1b;margin:0;background:#faf7f0}
+.page{background:#fff;border-radius:10px;padding:0 0 8mm;margin:0 0 10mm;overflow:hidden;page-break-after:always;box-sizing:border-box}
+header{background:#2F5D50;color:#fff;padding:8mm 10mm}
+.kicker{margin:0;font-size:10pt;letter-spacing:.06em;text-transform:uppercase;opacity:.9}
+h1{margin:2mm 0 1mm;font-size:26pt;line-height:1.1}
+.meta{margin:0;font-size:10pt;opacity:.9}
+h2{font-size:13pt;color:#2F5D50;margin:6mm 10mm 2mm}
+.ing{padding:0 10mm}
+ul{list-style:none;padding:0;margin:0;columns:2;column-gap:10mm}
+li{display:flex;justify-content:space-between;border-bottom:1px solid #e5e5df;padding:1.6mm 0;font-size:10pt;break-inside:avoid}
+li b{font-weight:bold}
+.allergy{margin:4mm 10mm 0;padding:2.5mm 3mm;background:#fbeee9;color:#b24a2b;font-weight:bold;font-size:9.5pt;border-radius:4px}
+.steps{display:grid;grid-template-columns:1fr 1fr;gap:5mm;padding:0 10mm}
+.step{position:relative;border:1px solid #d9d9d4;border-radius:8px;padding:9mm 4mm 4mm;text-align:center;background:#fafaf7;break-inside:avoid}
+.num{position:absolute;top:3mm;left:3mm;width:7mm;height:7mm;border-radius:50%;background:#2F5D50;color:#fff;font-weight:bold;font-size:10pt;display:flex;align-items:center;justify-content:center}
+.ic-svg{width:20mm;height:20mm;fill:#e8f0ec;stroke:#2F5D50;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;display:block;margin:0 auto 3mm}
+.step p{margin:0;font-size:9.5pt;line-height:1.35}
+@media print{body{background:#fff}.page{margin:0;border-radius:0}}`;
+function recipeCardHTML(full,r){
+  const steps=(r.steps&&r.steps.length)?r.steps:["Method coming soon."];
+  const ing=r.ingredients.map(i=>`<li><span>${esc(i.name)}</span><b>${i.unit==="each"?esc(i.qty):esc(i.qty+" "+i.unit)}</b></li>`).join("");
+  const st=steps.map((s,k)=>`<div class="step"><span class="num">${k+1}</span>${iconSvg(stepKind(s))}<p>${esc(s)}</p></div>`).join("");
+  const nut=(r.nut&&r.nut!=="None expected")?`<div class="allergy">Allergy check: ${esc(r.nut)}</div>`:"";
+  return `<section class="page"><header><p class="kicker">${esc(full)} · For four · ${r.prep+r.cook} min</p><h1>${esc(r.name)}</h1><p class="meta">${esc(r.method||"")} · ${esc(r.carb||"")}</p></header><h2>Ingredients</h2><div class="ing"><ul>${ing}</ul></div>${nut}<h2>Method</h2><div class="steps">${st}</div></section>`;
+}
+async function confirmWeek(){
+  const days=DAYS.map((d,i)=>({full:FULL_DAYS[i],r:S.recipes.find(x=>x.id===(S.plan[d]||{}).recipeId)})).filter(x=>x.r);
+  if(!days.length){ note("Plan some dinners before confirming the week."); return; }
+  let downloads=null;
+  try{ downloads=window.claude?await window.claude.use("downloads"):null; }catch(e){}
+  if(!downloads){ note("Saving files isn't available in this view."); return; }
+  note("Making your menu..."); paintStatus();
+  try{
+    const html=`<!DOCTYPE html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>This week's dinners</title><style>${MENU_CSS3}</style></head><body>${days.map(({full,r})=>recipeCardHTML3(full,r)).join("")}</body></html>`;
+    const blob=new Blob([html],{type:"text/html"});
+    await downloads.save({filename:"week-menu.html",data:blob});
+    note("Menu saved. Open it and print to PDF with background graphics on.");
+  }catch(e){
+    note("Couldn't save the menu: "+(e&&e.message?e.message:"save was cancelled"));
+  }
+}
+const MENU_CSS2=`@page{size:A4;margin:10mm}
+body{font-family:Georgia,'Times New Roman',serif;color:#2b2a26;margin:0;background:#f4efe4}
+.card{background:#fbf7ee;border:2px solid #2F5D50;border-radius:14px;padding:8mm 9mm 20mm;margin:0 0 8mm;box-sizing:border-box;page-break-after:always;min-height:270mm;position:relative}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:6mm;border-bottom:2px dashed #c9bfa8;padding-bottom:5mm}
+.kick{font-family:Arial,sans-serif;font-size:9pt;letter-spacing:.08em;text-transform:uppercase;color:#7a6d55;margin:0}
+h1{font-size:30pt;color:#2F5D50;margin:1mm 0 0;line-height:1.05}
+.hero{width:34mm;height:34mm;flex:none;fill:#fff;stroke:#2F5D50;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.cols{display:grid;grid-template-columns:62mm 1fr;gap:7mm;margin-top:6mm}
+h2{font-family:Arial,sans-serif;font-size:11pt;letter-spacing:.06em;text-transform:uppercase;color:#2F5D50;margin:0 0 3mm}
+ul{list-style:none;padding:0;margin:0}
+li{display:flex;justify-content:space-between;font-family:Arial,sans-serif;font-size:9.5pt;border-bottom:1px dotted #bfb59c;padding:1.4mm 0}
+.step{display:grid;grid-template-columns:15mm 1fr;gap:3mm;align-items:center;margin-bottom:4mm;break-inside:avoid}
+.step svg{width:15mm;height:15mm;fill:#fff;stroke:#2F5D50;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.step .n{font-family:Arial,sans-serif;font-weight:bold;color:#b24a2b;font-size:10pt;margin-right:1.5mm}
+.step p{margin:0;font-size:10pt;line-height:1.4}
+.foot{position:absolute;left:9mm;right:9mm;bottom:7mm;display:flex;justify-content:space-between;border-top:2px dashed #c9bfa8;padding-top:3mm;font-family:Arial,sans-serif;font-size:10pt}
+.allergy{font-family:Arial,sans-serif;font-size:9pt;color:#b24a2b;font-weight:bold;margin-top:4mm}
+@media print{body{background:#fff}}`;
+const HERO_KIND={Pasta:"pot",Rice:"bowl",Potato:"pan",Bread:"plate"};
+function recipeCardHTML2old(full,r){
+  const steps=(r.steps&&r.steps.length)?r.steps:["Method coming soon."];
+  const ing=r.ingredients.map(i=>`<li><span>${esc(i.name)}</span><span>${i.unit==="each"?esc(i.qty):esc(i.qty+" "+i.unit)}</span></li>`).join("");
+  const st=steps.map((s,k)=>`<div class="step"><svg viewBox="0 0 64 64">${ICONS[stepKind(s)]||ICONS.spoon}</svg><p><span class="n">${k+1}.</span>${esc(s)}</p></div>`).join("");
+  const nut=(r.nut&&r.nut!=="None expected")?`<p class="allergy">Allergy check: ${esc(r.nut)}</p>`:"";
+  return `<section class="card"><div class="top"><div><p class="kick">${esc(full)} · ${esc(r.method||"")} · ${esc(r.carb||"")}</p><h1>${esc(r.name)}</h1></div><svg viewBox="0 0 64 64" class="hero">${ICONS[HERO_KIND[r.carb]||"spoon"]}</svg></div><div class="cols"><div><h2>Ingredients</h2><ul>${ing}</ul>${nut}</div><div><h2>Method</h2>${st}</div></div><div class="foot"><span>Servings: 4</span><span>Time: ${r.prep+r.cook} min</span></div></section>`;
+}
+const MENU_CSS3=`@page{size:A4;margin:10mm}
+body{font-family:Georgia,'Times New Roman',serif;color:#2b2a26;margin:0;background:#f4efe4}
+.card{background:#fbf7ee;border:2px solid #2F5D50;border-radius:14px;padding:8mm 9mm 20mm;margin:0 0 8mm;box-sizing:border-box;page-break-after:always;min-height:270mm;position:relative}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:6mm;border-bottom:2px dashed #c9bfa8;padding-bottom:5mm}
+.kick{font-family:Arial,sans-serif;font-size:9pt;letter-spacing:.08em;text-transform:uppercase;color:#7a6d55;margin:0}
+h1{font-size:30pt;color:#2F5D50;margin:1mm 0 0;line-height:1.05}
+.hero{width:34mm;height:34mm;flex:none;fill:#fff;stroke:#2F5D50;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+h2{font-family:Arial,sans-serif;font-size:11pt;letter-spacing:.06em;text-transform:uppercase;color:#2F5D50;margin:6mm 0 3mm}
+.ing{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:1mm 6mm}
+.ing li{display:flex;justify-content:space-between;font-family:Arial,sans-serif;font-size:9pt;border-bottom:1px dotted #bfb59c;padding:1.2mm 0}
+.steps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4mm}
+.cell{border-top:2px solid #2F5D50;padding-top:2.5mm;break-inside:avoid}
+.lab{font-family:Arial,sans-serif;font-weight:bold;font-size:9pt;color:#2F5D50;text-transform:uppercase;letter-spacing:.05em;margin:0}
+.tile{background:#fff;border:1px solid #d9cfb8;border-radius:8px;height:24mm;display:flex;align-items:center;justify-content:center;margin:2mm 0}
+.tile svg{width:17mm;height:17mm;fill:#e8f0ec;stroke:#2F5D50;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.cell p{font-size:9pt;line-height:1.35;margin:0}
+.allergy{font-family:Arial,sans-serif;font-size:9pt;color:#b24a2b;font-weight:bold;margin-top:4mm}
+.foot{position:absolute;left:9mm;right:9mm;bottom:7mm;display:flex;justify-content:space-between;border-top:2px dashed #c9bfa8;padding-top:3mm;font-family:Arial,sans-serif;font-size:10pt}
+@media print{body{background:#fff}}`;
+const STEP_LABEL={pot:"Boil",pan:"Fry",basket:"Air-fry",knife:"Prep",bowl:"Mix",colander:"Drain",plate:"Serve",clock:"Rest",spoon:"Stir"};
+function recipeCardHTML3(full,r){
+  const steps=(r.steps&&r.steps.length)?r.steps:["Method coming soon."];
+  const ing=r.ingredients.map(i=>`<li><span>${esc(i.name)}</span><span>${i.unit==="each"?esc(i.qty):esc(i.qty+" "+i.unit)}</span></li>`).join("");
+  const cells=steps.map((s,k)=>{const kind=stepKind(s); return `<div class="cell"><p class="lab">Step ${k+1} · ${STEP_LABEL[kind]||"Stir"}</p><div class="tile"><svg viewBox="0 0 64 64">${ICONS[kind]||ICONS.spoon}</svg></div><p>${esc(s)}</p></div>`;}).join("");
+  const nut=(r.nut&&r.nut!=="None expected")?`<p class="allergy">Allergy check: ${esc(r.nut)}</p>`:"";
+  return `<section class="card"><div class="top"><div><p class="kick">${esc(full)} · ${esc(r.method||"")} · ${esc(r.carb||"")}</p><h1>${esc(r.name)}</h1></div><svg viewBox="0 0 64 64" class="hero">${ICONS[HERO_KIND[r.carb]||"spoon"]}</svg></div><h2>Ingredients</h2><ul class="ing">${ing}</ul>${nut}<h2>Method</h2><div class="steps">${cells}</div><div class="foot"><span>Servings: 4</span><span>Time: ${r.prep+r.cook} min</span></div></section>`;
+}
+const PRICES_RAW=["chicken breast|500|g|3.50|4.50","chicken thighs|8|each|3.50|4.50","chicken mince|500|g|2.50|3.50","pork sausages|8|each|2.00|3.00","pork loin|500|g|3.50|4.50","pork mince|500|g|2.50|3.20","beef mince|500|g|3.50|4.80","turkey mince|500|g|3.00|3.80","lamb mince|500|g|5.50|7.00","sirloin|400|g|6.00|9.00","sirloin steak|500|g|8.00|11.00","salmon fillet|2|each|4.50|6.50","smoked salmon|150|g|2.50|3.50","king prawn|300|g|4.00|6.00","cod fillet|4|each|6.00|8.00","tinned tuna|1|tin|1.20|1.60","tuna|1|tin|1.20|1.60","fish finger|16|each|2.50|3.50","ham|150|g|1.50|2.20","smoked bacon|150|g|1.80|2.50","bacon|150|g|1.80|2.50","chorizo|150|g|2.00|2.80","pepperoni|100|g|1.50|2.20","onion|3|each|0.90|1.20","red onion|1|each|0.60|0.90","garlic|1|each|0.40|0.60","pepper|3|each|1.50|2.00","red pepper|3|each|1.50|2.00","potato|1000|g|1.20|1.80","baby potato|800|g|1.50|2.20","spinach|200|g|1.00|1.50","cherry tomato|250|g|1.00|1.50","tomato|4|each|1.00|1.50","mushroom|250|g|0.90|1.30","carrot|1|each|0.25|0.40","leek|1|each|0.80|1.20","cucumber|1|each|0.60|0.90","romaine lettuce|1|each|1.00|1.50","spring onion|3|each|0.80|1.10","sweetcorn|200|g|0.70|1.00","frozen pea|500|g|1.00|1.60","tenderstem broccoli|200|g|1.50|2.20","pak choi|2|each|1.00|1.50","avocado|2|each|1.20|1.80","lime|1|each|0.25|0.50","lemon|1|each|0.30|0.50","eating apple|1|each|0.40|0.60","parsley|1|bunch|0.80|1.20","coriander|1|bunch|0.80|1.20","dill|1|bunch|0.80|1.20","mint|1|bunch|0.80|1.20","basil|1|bunch|0.80|1.20","double cream|300|ml|1.20|1.80","crème fraîche|150|g|0.90|1.30","soured cream|200|g|0.80|1.20","natural yoghurt|150|g|0.70|1.00","parmesan|200|g|2.50|3.50","cheddar|200|g|1.50|2.20","mozzarella|125|g|1.00|1.50","feta|200|g|1.50|2.20","butter|250|g|1.90|2.50","milk|568|ml|0.80|1.10","egg|6|each|1.50|2.20","sun-dried tomato|190|g|1.50|2.50","passata|400|g|0.70|1.00","chopped tomato|1|tin|0.45|0.70","tinned tomato|1|tin|0.45|0.70","kidney bean|1|tin|0.60|0.90","tinned chickpea|1|tin|0.50|0.80","tinned black bean|1|tin|0.60|0.90","baked bean|1|tin|0.50|0.80","tinned pineapple chunk|1|tin|0.80|1.20","coconut milk|1|tin|0.80|1.20","beef stock cube|1|each|0.10|0.20","chicken stock cube|1|each|0.10|0.20","basmati rice|1000|g|1.80|2.50","rice|1000|g|1.50|2.20","arborio rice|500|g|2.00|3.00","paella rice|500|g|2.00|3.00","penne|500|g|0.90|1.20","fusilli|500|g|0.90|1.20","pasta|500|g|0.90|1.20","orecchiette|500|g|1.50|2.20","linguine|500|g|1.00|1.40","tagliatelle|500|g|1.20|1.60","spaghetti|500|g|0.90|1.20","macaroni|500|g|0.90|1.20","rigatoni|500|g|1.00|1.40","fettuccine|500|g|1.20|1.60","orzo|500|g|1.20|1.60","gnocchi|500|g|1.50|2.20","brioche bun|4|each|1.50|2.20","tortilla wrap|8|each|1.20|1.80","tortilla|8|each|1.20|1.80","baguette|4|each|1.50|2.20","ciabatta|4|each|1.50|2.00","pitta bread|5|each|1.00|1.50","bread roll|4|each|1.20|1.80","thick sliced bread|8|each|1.00|1.50","hot dog roll|4|each|1.00|1.50","ready-rolled puff pastry|1|pack|1.50|2.20","cheese slice|10|each|1.50|2.20","cheddar slice|10|each|1.50|2.20","gherkin|1|each|1.00|1.50","panko breadcrumb|200|g|1.20|1.80","breadcrumb|200|g|1.00|1.50","plain flour|1500|g|0.90|1.30","pesto|190|g|1.50|2.50","nut-free pesto|190|g|1.50|2.50","salsa|200|g|1.00|1.50","coleslaw|200|g|1.00|1.50","olive oil|500|ml|3.00|4.50","rapeseed oil|500|ml|2.00|3.00","oil|500|ml|2.00|3.00","soy sauce|150|ml|1.00|1.50","oyster sauce|150|ml|1.50|2.20","honey|340|ml|2.50|3.50","sweet chilli sauce|300|ml|1.50|2.20","yakitori sauce|150|ml|2.00|2.80","teriyaki sauce|150|ml|2.00|2.80","gochujang|200|ml|2.50|3.50","sweet and sour sauce|300|ml|1.50|2.20","katsu sauce|250|ml|2.00|3.00","tartare sauce|250|ml|1.50|2.20","caesar dressing|250|ml|2.00|3.00","mayonnaise|400|ml|2.00|3.00","ketchup|460|ml|1.20|1.80","dijon mustard|215|ml|1.20|1.80","mustard|200|ml|1.00|1.50","wholegrain mustard|200|ml|1.50|2.20","cranberry sauce|200|ml|1.50|2.20","tomato purée|200|ml|0.70|1.00","gravy granule|200|g|1.20|1.80","garlic butter|200|g|1.50|2.20","garlic dip|200|ml|1.50|2.20","tikka paste|283|ml|1.80|2.50","biryani paste|283|ml|1.80|2.50","curry paste|283|ml|1.50|2.50","mild curry paste|283|ml|1.50|2.50","red curry paste|283|ml|1.50|2.50","green curry paste|283|ml|1.50|2.50","jerk seasoning|100|ml|2.00|3.00","taco seasoning|1|packet|1.00|1.50","fajita seasoning|100|ml|1.50|2.20","burger seasoning|100|ml|1.50|2.20","cajun seasoning|100|ml|1.50|2.20","chilli powder|40|ml|0.80|1.20","smoked paprika|40|ml|1.00|1.50","paprika|40|ml|0.80|1.20","ground cumin|40|ml|0.80|1.20","dried oregano|15|ml|0.70|1.00","oregano|15|ml|0.70|1.00","rosemary|15|ml|0.70|1.00","thyme|15|ml|0.70|1.00","sage|15|ml|0.70|1.00","mixed herb|15|ml|0.70|1.00","garlic powder|40|ml|0.80|1.20","chilli flake|20|ml|0.80|1.20","sesame seed|100|ml|1.00|1.50","cornflour|200|ml|0.80|1.20","red chilli|1|each|0.30|0.50","chilli|1|each|0.30|0.50","rocket|1|bag|1.00|1.50","jacket potato|4|each|1.20|1.80","ready-made pizza|2|each|5.00|7.00","smoked bacon rasher|8|each|1.80|2.50","sirloin steak|4|each|8.00|11.00","chicken thighs g|500|g|3.50|4.50","side salad|1|bag|1.50|2.50","unsmoked back bacon|1|pack|2.00|3.00","black pudding|1|each|1.50|2.50","chocolate chips|200|g|1.50|2.50","bell pepper|3|each|1.50|2.00","garlic granules|56|g|1.00|1.00","pop|24|can|7.00|10.00","banana|5|each|0.90|1.30","apple|6|each|1.20|1.80","clementine|10|each|1.50|2.20","grapes|500|g|1.80|2.50","strawberry|400|g|1.80|2.50","blueberry|150|g|1.50|2.20","porridge oats|1000|g|1.20|1.80","granola|500|g|2.00|3.00","cereal|500|g|1.80|2.80","greek yoghurt|500|g|2.00|3.00","honey|340|g|2.00|3.00","jam|340|g|1.20|1.80","biscuit|300|g|1.00|1.80","chocolate|100|g|1.00|1.50","cake|1|each|1.50|2.50","ice cream|500|ml|2.50|3.50","crisps|6|each|2.00|3.00","shampoo|400|ml|2.00|3.50","shower gel|500|ml|2.00|3.50","toothpaste|75|ml|1.20|2.00","toothbrush|2|each|1.50|2.50","deodorant|150|ml|2.00|3.50","toilet roll|9|each|3.00|5.00","washing up liquid|500|ml|1.00|1.80","bin bag|20|each|1.00|1.80","handwash|250|ml|1.00|1.80"];
+const PRICES={};
+PRICES_RAW.forEach(s=>{const [n,p,u,lo,hi]=s.split("|"); PRICES[n]={pack:+p,unit:u,low:+lo,high:+hi};});
+const normU=u=>String(u||"").toLowerCase().trim().replace(/s$/,"");
+const normN=n=>String(n||"").toLowerCase().trim().replace(/\s+/g," ");
+function bandFor(name,need,unit){
+  const ak=normN(name)+"|"+normU(unit), act=S.actual&&S.actual[ak];
+  if(act){ const cv={tbsp:15,tsp:5}[normU(unit)]||1; const packs=Math.max(1,Math.ceil(need*cv/act.pack)); return {packs,pack:act.pack,unitName:act.unitName,low:packs*act.price,high:packs*act.price,mine:true}; }
+  const nm=normN(name), nu=normU(unit);
+  const full=PRICES[nm+" "+nu];
+  if(full){ const packs=Math.max(1,Math.ceil(need/full.pack)); return {packs,pack:full.pack,unitName:full.unit,low:packs*full.low,high:packs*full.high}; }
+  let q=need, u=nu;
+  if(String(unit||"").trim().startsWith("(")||nu==="clove") u="each";
+  const conv={tbsp:15,tsp:5};
+  if(conv[nu]){ q=need*conv[nu]; u="ml"; }
+  const p=PRICES[nm]||PRICES[nm.replace(/es$/,"")]||PRICES[nm.replace(/s$/,"")];
+  if(!p||normU(p.unit)!==u) return null;
+  const packs=Math.max(1,Math.ceil(q/p.pack));
+  return {packs,pack:p.pack,unitName:p.unit,low:packs*p.low,high:packs*p.high};
+}
+function costCell(x){
+  const b=bandFor(x.name,x.buy,x.unit);
+  if(!b) return '<span class="muted">pantry or not priced</span>';
+  return `${gbp(b.low)} to ${gbp(b.high)}<div class="note">${b.packs} × ${b.pack} ${esc(b.unitName)} pack</div>`;
+}
+function totalBand(list){
+  let lo=0, hi=0, n=0;
+  list.forEach(x=>{ const b=bandFor(x.name,x.buy,x.unit); if(b){ lo+=b.low; hi+=b.high; n++; } });
+  return `${gbp(lo)} to ${gbp(hi)} (${n} of ${list.length} items priced)`;
+}
+const V={stock:vStock,house:vHouse,recipes:vRecipes,plan:vPlan,shop:vShop,budget:vBudget};
+
+function render(){
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
+  document.getElementById("view").innerHTML=V[tab]();
+  paintStatus();
+}
+function paintStatus(){ document.getElementById("status").textContent=status; }
+
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-tab],[data-a]");
+  if(!t) return;
+  if(t.dataset.tab){ tab=t.dataset.tab; render(); return; }
+  const a=t.dataset.a, id=t.dataset.id;
+  switch(a){
+    case "stock-inc":
+    case "stock-dec": {
+      const s=S.stock.find(x=>x.id===id);
+      if(s){ const st=stepFor(s.unit); s.qty=Math.max(0,+(s.qty+(a==="stock-inc"?st:-st)).toFixed(2)); }
+      break;
+    }
+    case "stock-del": S.stock=S.stock.filter(x=>x.id!==id); break;
+    case "stock-add": {
+      const name=val("sn").trim();
+      if(!name){ note("Give the stock item a name."); return; }
+      S.stock.push({id:uid0(),name,qty:+val("sq")||0,unit:val("su").trim()||"each",low:+val("sl")||0});
+      break;
+    }
+    case "house-add": {
+      const name=val("hn").trim();
+      if(!name){ note("Give the item a name."); return; }
+      S.stock.push({id:uid0(),name,unit:val("hu").trim()||"each",qty:+val("hq")||0,low:+val("hl")||0,cat:val("hc")||"Household",need:+val("hw")||0});
+      break;
+    }
+    case "rec-add": {
+      const name=val("rn").trim();
+      if(!name){ note("Give the recipe a name."); return; }
+      const ingredients=val("ri").split("\n").map(l=>l.split(",").map(x=>x.trim())).filter(p=>p[0])
+        .map(p=>({name:p[0],qty:parseFloat(p[1])||0,unit:p[2]||"each"}));
+      S.recipes.push({id:uid0(),name,servings:Math.max(1,+val("rs")||1),cost:+val("rc")||0,
+        prep:+val("rp")||0,cook:+val("rk")||0,ingredients});
+      break;
+    }
+    case "rec-del": {
+      S.recipes=S.recipes.filter(x=>x.id!==id);
+      Object.keys(S.plan).forEach(d=>{ if(S.plan[d]&&S.plan[d].recipeId===id) delete S.plan[d]; });
+      break;
+    }
+    case "plan-cook": cook(t.dataset.day); break;
+    case "rec-starter": {
+      let added=0;
+      STARTER.forEach(x=>{
+        if(!S.recipes.some(r=>norm(r.name)===norm(x.name))){
+          S.recipes.push({...x,id:uid0(),ingredients:x.ingredients.map(i=>({...i}))}); added++;
+        }
+      });
+      note(added?`Added ${added} starter recipe${added===1?'':'s'}.`:"Starter recipes are already in your library.");
+      break;
+    }
+    case "plan-generate": generateWeek(); break;
+    case "plan-confirm": confirmWeek(); break;
+    case "plan-clear": S.plan={}; break;
+    case "shop-bought": {
+      const name=t.dataset.name, unit=t.dataset.unit, q=+t.dataset.buy||0;
+      const s=S.stock.find(x=>norm(x.name)===norm(name)&&norm(x.unit)===norm(unit));
+      if(s) s.qty+=q; else S.stock.push({id:uid0(),name,unit,qty:q,low:0});
+      break;
+    }
+    default: return;
+  }
+  save(); render();
+});
+
+document.addEventListener("change",e=>{
+  const t=e.target;
+  if(t.id==="sn"){ const o=[...document.querySelectorAll("#ingr option")].find(x=>x.value===t.value); if(o&&o.dataset.unit) document.getElementById("su").value=o.dataset.unit; return; }
+  if(t.dataset.a==="actual"){
+    if(!S.actual) S.actual={};
+    const ak=normN(t.dataset.name)+"|"+normU(t.dataset.unit);
+    const b=bandFor(t.dataset.name,+t.dataset.buy,t.dataset.unit);
+    if(!b){ note("No pack size for that item, so it can't be learned."); return; }
+    const paid=+t.value;
+    if(!paid){ delete S.actual[ak]; } else { S.actual[ak]={pack:b.pack,unitName:b.unitName,price:paid/b.packs}; }
+    save(); render(); return;
+  }
+  if(t.dataset.a==="plan-set"){
+    const d=t.dataset.day;
+    if(t.value) S.plan[d]={recipeId:t.value,cooked:false}; else delete S.plan[d];
+    save(); render(); return;
+  }
+  if(t.dataset.f){
+    const [sec,k]=t.dataset.f.split(".");
+    if(k===undefined) S[sec]=+t.value||0; else S[sec][k]=+t.value||0;
+    save(); render();
+  }
+});
+
+render();
+connect();
+</script>
+</body>
+</html>
