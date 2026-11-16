@@ -399,11 +399,10 @@ function shopping(){
     const add=(Number(s.need)||0)+back; if(!add) return;
     const k=norm(s.name)+"|"+norm(s.unit); need[k]=need[k]||{name:s.name,unit:s.unit,qty:0}; need[k].qty+=add;
   });
-  Object.keys(S.bought||{}).forEach(k=>{ const m=S.boughtMeta&&S.boughtMeta[k]; if(m){ const nk=norm(m.name)+"|"+norm(m.unit); if(!need[nk]) need[nk]={name:m.name,unit:m.unit,qty:0}; } });
   return Object.values(need).map(n=>{
     const have=S.stock.filter(s=>norm(s.name)===norm(n.name)&&norm(s.unit)===norm(n.unit)).reduce((a,s)=>a+s.qty,0);
     return {...n,have,buy:Math.max(0,n.qty-have)};
-  }).filter(x=>x.buy>0||(S.bought&&S.bought[normN(x.name)+"|"+normU(x.unit)]));
+  }).filter(x=>x.buy>0);
 }
 
 function cook(d){
