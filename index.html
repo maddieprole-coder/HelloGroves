@@ -131,6 +131,7 @@ button.b:hover{background:#b35f3b}
 button.s:hover{border-color:#c9704a;color:#c9704a}
 tr.sec td{color:#c9704a}
 @media (max-width:640px){ header{padding:16px 14px} header h1 .word{font-size:26px} .mark{width:40px;height:40px;font-size:14px} }
+tr.done td{text-decoration:line-through;color:var(--mut)}
 </style>
 </head>
 <body>
@@ -550,11 +551,12 @@ function vShop(){
       if(conv[normU(x.unit)]) q=+(b.packs*b.pack/conv[normU(x.unit)]).toFixed(2);
       else if(normU(b.unitName)===normU(x.unit)) q=b.packs*b.pack;
     }
-    return head+`<tr>
+    const dk=normN(x.name)+"|"+normU(x.unit);
+    return head+`<tr class="${S.bought&&S.bought[dk]?'done':''}">
       <td>${esc(x.name)}</td><td>${x.qty} ${esc(x.unit)}</td><td>${x.have} ${esc(x.unit)}</td>
       <td><strong>${x.buy} ${esc(x.unit)}</strong></td><td>${costCell(x)}</td>
       <td><input type="number" step="0.01" min="0" placeholder="£ paid" data-a="actual" data-name="${esc(x.name)}" data-unit="${esc(x.unit)}" data-buy="${x.buy}" style="width:90px"></td>
-      <td><button class="s" data-a="shop-bought" data-name="${esc(x.name)}" data-unit="${esc(u)}" data-buy="${q}">Bought</button> <span class="note">adds ${q} ${esc(u)}</span></td></tr>`;
+      <td><button class="s" data-a="shop-bought" data-name="${esc(x.name)}" data-unit="${esc(u)}" data-buy="${q}" data-key="${dk}">Bought</button> <span class="note">adds ${q} ${esc(u)}</span></td></tr>`;
   }).join("");
   return `<div class="card shop"><h2>Shopping list</h2>
     <table><thead><tr><th>Item</th><th>Needed</th><th>In stock</th><th>To buy</th><th>Est. cost (shelf price)</th><th>Actual paid (£)</th><th></th></tr></thead>
@@ -886,6 +888,7 @@ METHODS["Lemon and garlic chicken with rice"]=["Rinse the rice and cook it for 1
 const FIXED_NAMES=["Chicken nuggets and chips","Pizza night"];
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function generateWeek(){
+  S.bought={};
   const cooked=DAYS.filter(d=>S.plan[d]&&S.plan[d].cooked);
   const open=DAYS.filter(d=>!(S.plan[d]&&S.plan[d].cooked)&&d!=="Fri"&&d!=="Sat");
   const used=new Set(cooked.map(d=>S.plan[d].recipeId));
@@ -1353,6 +1356,7 @@ document.addEventListener("click",e=>{
     case "plan-confirm": confirmWeek(); break;
     case "plan-clear": S.plan={}; break;
     case "shop-bought": {
+      S.bought=S.bought||{}; S.bought[t.dataset.key]=true;
       const name=t.dataset.name, unit=t.dataset.unit, q=+t.dataset.buy||0;
       const s=S.stock.find(x=>norm(x.name)===norm(name)&&norm(x.unit)===norm(unit));
       if(s) s.qty+=q; else S.stock.push({id:uid0(),name,unit,qty:q,low:0});
