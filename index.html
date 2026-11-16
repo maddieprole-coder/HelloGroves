@@ -402,7 +402,7 @@ function shopping(){
   return Object.values(need).map(n=>{
     const have=S.stock.filter(s=>norm(s.name)===norm(n.name)&&norm(s.unit)===norm(n.unit)).reduce((a,s)=>a+s.qty,0);
     return {...n,have,buy:Math.max(0,n.qty-have)};
-  }).filter(x=>x.buy>0);
+  }).filter(x=>x.buy>0 && !(S.bought&&S.bought[normN(x.name)+"|"+normU(x.unit)]));
 }
 
 function cook(d){
