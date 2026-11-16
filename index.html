@@ -893,7 +893,7 @@ function generateWeek(){
   cooked.forEach(d=>{const r=S.recipes.find(x=>x.id===S.plan[d].recipeId); if(r) carbs[r.carb]=(carbs[r.carb]||0)+1;});
   const cutoff=new Date(Date.now()-21*864e5).toISOString().slice(0,10);
   const recent=new Set((S.history||[]).filter(h=>h.date>=cutoff).map(h=>h.recipeId));
-  const basePool=S.recipes.filter(r=>!used.has(r.id)&&r.carb!=="Bread"&&!FIXED_NAMES.includes(r.name)&&!(r.ingredients||[]).some(i=>/leek|\bham\b/i.test(i.name)));
+  const basePool=S.recipes.filter(r=>!used.has(r.id)&&r.carb!=="Bread"&&!FIXED_NAMES.includes(r.name)&&!(r.ingredients||[]).some(i=>/leek|\bham\b|pak choi/i.test(i.name)));
   const freshPool=basePool.filter(r=>!recent.has(r.id));
   const pool=shuffle(freshPool.length>=open.length?freshPool:basePool);
   if(!pool.length){ note("Add some recipes first."); return; }
@@ -1195,12 +1195,13 @@ async function confirmWeek(){
   if(!days.length){ note("Plan some dinners before confirming the week."); return; }
   let downloads=null;
   try{ downloads=window.claude?await window.claude.use("downloads"):null; }catch(e){}
-  if(!downloads){ note("Saving files isn't available in this view."); return; }
   note("Making your menu..."); paintStatus();
   try{
     const html=`<!DOCTYPE html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>This week's dinners</title><style>${MENU_CSS3}</style></head><body>${days.map(({full,r})=>recipeCardHTML3(full,r)).join("")}</body></html>`;
+    const w=window.open("","_blank");
+    if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),500); note("Print window opened: choose Save as PDF."); return; }
     const blob=new Blob([html],{type:"text/html"});
-    await downloads.save({filename:"week-menu.html",data:blob});
+    if(downloads) await downloads.save({filename:"week-menu.html",data:blob}); else { const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="week-menu.html"; document.body.appendChild(a); a.click(); a.remove(); }
     note("Menu saved. Open it and print to PDF with background graphics on.");
   }catch(e){
     note("Couldn't save the menu: "+(e&&e.message?e.message:"save was cancelled"));
