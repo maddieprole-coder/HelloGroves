@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Virtual kitchen</title>
+<title>Hello Groves</title>
 <style>
 :root{--g:#2F5D50;--g2:#e8f0ec;--ink:#1d1d1b;--mut:#666;--line:#d9d9d4;--warn:#b24a2b;--bg:#fafaf7}
 *{box-sizing:border-box}
@@ -104,11 +104,38 @@ button.b:hover{background:#34594b}
 .note{font-style:italic;line-height:1.6}
 tr.sec td{color:var(--sage);letter-spacing:.14em}
 .low{color:#a4482a}
+/* Hello Groves branding */
+header{padding:14px 28px}
+header h1{display:flex;align-items:center;gap:12px;margin:0;font-family:Georgia,"Times New Roman",serif;font-size:22px;font-weight:400;letter-spacing:.01em}
+.mark{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--g);color:#fff;font-family:Arial,sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;box-shadow:inset 0 0 0 3px rgba(255,255,255,.18)}
+.word{color:var(--ink)}
+.tag{font-family:Georgia,serif;font-style:italic;font-size:13px;color:var(--mut);margin-left:6px;padding-left:14px;border-left:1px solid var(--line)}
+main{position:relative}
+main::before{content:"";display:block;height:2px;width:56px;background:var(--g);margin:0 0 22px;border-radius:2px}
+@media (max-width:640px){ .tag{display:none} header{padding:12px 14px} main::before{margin-bottom:16px} }
+/* Hello Groves bold pass */
+body{background:#f6efe1}
+header{background:#2f5d50;box-shadow:none;border-bottom:0;padding:24px 28px}
+header h1{gap:14px}
+header h1 .word{color:#f6efe1;font-size:32px;line-height:1}
+.mark{background:#e9b949;color:#2f5d50;width:48px;height:48px;font-size:16px;box-shadow:none}
+.tag{color:#e6d6b0;border-left-color:rgba(246,239,225,.35);font-size:14px}
+nav button{color:#e6d6b0;border-color:transparent}
+nav button:hover{color:#fff}
+nav button.on{background:#f6efe1;color:#2f5d50}
+main::before{width:96px;height:5px;background:#e9b949;margin-bottom:26px}
+.card{border-top:4px solid #2f5d50;box-shadow:0 2px 0 rgba(47,93,80,.06)}
+h2{color:#2f5d50;font-size:24px;letter-spacing:-.01em}
+button.b{background:#c9704a;box-shadow:0 6px 14px -6px rgba(201,112,74,.6)}
+button.b:hover{background:#b35f3b}
+button.s:hover{border-color:#c9704a;color:#c9704a}
+tr.sec td{color:#c9704a}
+@media (max-width:640px){ header{padding:16px 14px} header h1 .word{font-size:26px} .mark{width:40px;height:40px;font-size:14px} }
 </style>
 </head>
 <body>
 <header>
-  <h1>Virtual kitchen</h1>
+  <h1><span class="mark">HG</span><span class="word">Hello Groves</span><span class="tag">dinners for four, sorted</span></h1>
   <nav>
     <button data-tab="stock" class="on">Stock</button>
     <button data-tab="house">Household</button>
@@ -866,7 +893,7 @@ function generateWeek(){
   cooked.forEach(d=>{const r=S.recipes.find(x=>x.id===S.plan[d].recipeId); if(r) carbs[r.carb]=(carbs[r.carb]||0)+1;});
   const cutoff=new Date(Date.now()-21*864e5).toISOString().slice(0,10);
   const recent=new Set((S.history||[]).filter(h=>h.date>=cutoff).map(h=>h.recipeId));
-  const basePool=S.recipes.filter(r=>!used.has(r.id)&&r.carb!=="Bread"&&!FIXED_NAMES.includes(r.name));
+  const basePool=S.recipes.filter(r=>!used.has(r.id)&&r.carb!=="Bread"&&!FIXED_NAMES.includes(r.name)&&!(r.ingredients||[]).some(i=>/leek|\bham\b/i.test(i.name)));
   const freshPool=basePool.filter(r=>!recent.has(r.id));
   const pool=shuffle(freshPool.length>=open.length?freshPool:basePool);
   if(!pool.length){ note("Add some recipes first."); return; }
