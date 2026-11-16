@@ -402,7 +402,7 @@ function shopping(){
   return Object.values(need).map(n=>{
     const have=S.stock.filter(s=>norm(s.name)===norm(n.name)&&norm(s.unit)===norm(n.unit)).reduce((a,s)=>a+s.qty,0);
     return {...n,have,buy:Math.max(0,n.qty-have)};
-  }).filter(x=>x.buy>0);
+  }).filter(x=>x.buy>0||(S.bought&&S.bought[normN(x.name)+"|"+normU(x.unit)]));
 }
 
 function cook(d){
@@ -561,7 +561,7 @@ function vShop(){
   return `<div class="card shop"><h2>Shopping list</h2>
     <table><thead><tr><th>Item</th><th>Needed</th><th>In stock</th><th>To buy</th><th>Est. cost (shelf price)</th><th>Actual paid (£)</th><th></th></tr></thead>
     <tbody>${listRows||'<tr><td colspan="7" class="muted">Nothing to buy. Your stock covers the plan, or no dinners are planned.</td></tr>'}</tbody></table>
-    <p class="row"><strong>Estimated shop: ${totalBand(list)}</strong></p><p class="note">“Bought” adds the whole pack to stock, so anything left over stays in stock for later meals. Anything marked low is topped up to one spare pack. Prices are rough Tesco-style estimates, not live shelf prices. Type what you paid in Actual paid (for the whole line) and future estimates for that item use your price. Items with no price show as pantry or not priced.</p></div>`;
+    <p class="row"><strong>Estimated shop: ${totalBand(list.filter(x=>x.buy>0))}</strong></p><p class="note">“Bought” adds the whole pack to stock, so anything left over stays in stock for later meals. Anything marked low is topped up to one spare pack. Prices are rough Tesco-style estimates, not live shelf prices. Type what you paid in Actual paid (for the whole line) and future estimates for that item use your price. Items with no price show as pantry or not priced.</p></div>`;
 }
 
 function vBudget(){
