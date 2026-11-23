@@ -141,8 +141,7 @@ tr.done td{text-decoration:line-through;color:var(--mut)}
     <button data-tab="stock" class="on">Stock</button>
     <button data-tab="house">Household</button>
     <button data-tab="recipes">Recipes</button>
-    <button data-tab="plan">Plan</button>
-    <button data-tab="shop">Shopping list</button>
+    <button data-tab="weekly">4 weekly</button>
     <button data-tab="budget">Budget</button>
   </nav>
   <div class="note" id="status" style="color:#fff;opacity:.85">Loading…</div>
@@ -378,6 +377,16 @@ function fixWeeklySnacks(){
   add('multipack crisps','pack',1,'Sweet treats');
   S.weeklySnacks=true;
 }
+function fixWeeksV2(){
+  if(S.weeksV2) return;
+  S.weekPlans=S.weekPlans||{}; S.shopDone=S.shopDone||{};
+  const map={this:'w0',next:'w1'};
+  Object.keys(map).forEach(o=>{ if(S.weekPlans[o]&&!S.weekPlans[map[o]]) S.weekPlans[map[o]]=S.weekPlans[o]; if(S.shopDone[o]&&!S.shopDone[map[o]]) S.shopDone[map[o]]=S.shopDone[o]; });
+  const cur=map[S.weekKey]||'w0';
+  S.weekPlans[cur]=S.plan||{};
+  S.weekKey=cur;
+  S.weeksV2=true;
+}
 function fixPop(){
   if(S.popFixed) return;
   const s=(S.stock||[]).find(x=>normN(x.name)==="pop");
@@ -411,6 +420,7 @@ function seedPantry(){
   fixPrawnStock();
   fixPrawnOil();
   fixWeeklySnacks();
+  fixWeeksV2();
   purgeSideSalad();
   fixLambMince();
   if(S.pantrySeeded) return;
@@ -493,19 +503,24 @@ function normaliseIngredients(){
     S.granulesFixed2=true;
   }
 }
-function shopping(){
+function allPlans(){
+  S.weekPlans=S.weekPlans||{};
+  const other=(S.weekKey==='next')?'this':'next';
+  return [S.plan||{}, S.weekPlans[other]||{}];
+}
+function shopping(PLAN){
   purgeSideSalad();
   normaliseIngredients();
   const need={};
-  DAYS.forEach(d=>{
-    const p=S.plan[d]; if(!p||!p.recipeId||p.cooked) return;
+  [PLAN||S.plan].forEach(PL=>DAYS.forEach(d=>{
+    const p=PL[d]; if(!p||!p.recipeId||p.cooked) return;
     const r=S.recipes.find(x=>x.id===p.recipeId); if(!r) return;
     r.ingredients.forEach(i=>{
       const k=norm(i.name)+"|"+norm(i.unit);
       need[k]=need[k]||{name:i.name,unit:i.unit,qty:0};
       need[k].qty+=Number(i.qty)||0;
     });
-  });
+  }));
   S.stock.forEach(s=>{
     const lowAt=s.low>0?s.low:(portionFor(s)||s.need||0);
     const back=s.qty<=lowAt?backFor(s):0;
@@ -616,6 +631,14 @@ function vRecipes(){
     <p><button class="b" data-a="rec-add">Save recipe</button></p></div>`;
 }
 
+function switchWeek(k){
+  S.weekPlans=S.weekPlans||{};
+  const cur=S.weekKey||'this';
+  S.weekPlans[cur]=S.plan||{};
+  S.weekKey=k;
+  S.plan=S.weekPlans[k]||{};
+  S.weekPlans[k]=S.plan;
+}
 function vPlan(){
   const opts=id=>`<option value="">— nothing —</option>`+S.recipes.map(r=>`<option value="${r.id}"${r.id===id?' selected':''}>${esc(r.name)}</option>`).join("");
   const rows=DAYS.map(d=>{
@@ -627,7 +650,8 @@ function vPlan(){
       <td>${r?gbp(r.cost):'<span class="muted">—</span>'}</td>
       <td>${action}</td></tr>`;
   }).join("");
-  return `<div class="card"><h2>This week</h2>
+  const wk=S.weekKey||'w0';
+  return `<div class="card"><h2>${weekLabel(wk)} · plan</h2>
     <table><thead><tr><th>Day</th><th>Dinner</th><th>Cost</th><th></th></tr></thead><tbody>${rows}</tbody></table>
     <p class="row" style="margin-top:10px"><button class="b" data-a="plan-generate">Generate random week</button> <button class="b" data-a="plan-confirm">Confirm week (PDF)</button> <button class="s" data-a="plan-clear">Clear week</button></p><p class="note">Generate fills Monday to Thursday and Sunday with five dinners, no more than two of any carb. Friday is chicken nuggets and Saturday is pizza. No sandwiches or wraps. Cooked days are left alone.</p></div>`;
 }
@@ -650,8 +674,17 @@ function sectionFor(name){
   return r?r[1]:"Other";
 }
 function vShop(){
+  return vShopOne(S.weekKey||'w0');
+}
+function weekLabel(k){
+  const t=new Date(); const dow=(t.getDay()+6)%7;
+  const m=new Date(t.getFullYear(),t.getMonth(),t.getDate()-dow+(7*(parseInt(String(k).replace(/\D/g,''),10)||0)));
+  return 'w/c '+String(m.getDate()).padStart(2,'0')+'/'+String(m.getMonth()+1).padStart(2,'0');
+}
+function planFor(k){ return k===(S.weekKey||'this')?S.plan:((S.weekPlans||{})[k]||{}); }
+function vShopOne(WK){
   const conv={tbsp:15,tsp:5};
-  const list=shopping();
+  const list=shopping(planFor(WK));
   const sorted=[...list].sort((a,b)=>SECTIONS.indexOf(sectionFor(a.name))-SECTIONS.indexOf(sectionFor(b.name)));
   let lastSec="";
   const listRows=sorted.map(x=>{
@@ -671,10 +704,10 @@ function vShop(){
       <td><input type="number" step="0.01" min="0" placeholder="£ paid" data-a="actual" data-name="${esc(x.name)}" data-unit="${esc(x.unit)}" data-buy="${x.buy}" style="width:90px"></td>
       <td><button class="s" data-a="shop-bought" data-name="${esc(x.name)}" data-unit="${esc(u)}" data-buy="${q}" data-key="${dk}">Bought</button> <span class="note">adds ${q} ${esc(u)}</span></td></tr>`;
   }).join("");
-  return `<div class="card shop"><h2>Shopping list <button class="s" data-a="shop-all">Already shopped: add whole list to stock</button></h2>
+  return `<div class="card shop"><h2>Shopping · ${weekLabel(WK)}${(S.shopDone||{})[WK]?'<span class="ok"> Shop done '+esc(S.shopDone[WK])+'</span>':''}</h2>
     <table><thead><tr><th>Item</th><th>Needed</th><th>In stock</th><th>To buy</th><th>Est. cost (shelf price)</th><th>Actual paid (£)</th><th></th></tr></thead>
     <tbody>${listRows||'<tr><td colspan="7" class="muted">Nothing to buy. Your stock covers the plan, or no dinners are planned.</td></tr>'}</tbody></table>
-    <p class="row"><strong>Estimated shop: ${totalBand(list.filter(x=>x.buy>0))}</strong></p><p class="note">“Bought” adds the whole pack to stock, so anything left over stays in stock for later meals. Anything marked low is topped up to one spare pack. Prices are rough Tesco-style estimates, not live shelf prices. Type what you paid in Actual paid (for the whole line) and future estimates for that item use your price. Items with no price show as pantry or not priced.</p></div>`;
+    <p class="row"><strong>Estimated shop: ${totalBand(list.filter(x=>x.buy>0))}</strong>${(S.shopDone||{})[WK]?'':' <button class="b" data-a="shop-all" data-week="'+WK+'">Shop done for '+weekLabel(WK)+'</button>'}</p><p class="note">“Bought” adds the whole pack to stock, so anything left over stays in stock for later meals. Anything marked low is topped up to one spare pack. Prices are rough Tesco-style estimates, not live shelf prices. Type what you paid in Actual paid (for the whole line) and future estimates for that item use your price. Items with no price show as pantry or not priced.</p></div>`;
 }
 
 function vBudget(){
@@ -1407,9 +1440,15 @@ function totalBand(list){
   list.forEach(x=>{ const b=bandFor(x.name,x.buy,x.unit); if(b){ lo+=b.low; hi+=b.high; n++; } });
   return `${gbp(lo)} to ${gbp(hi)} (${n} of ${list.length} items priced)`;
 }
-const V={stock:vStock,house:vHouse,recipes:vRecipes,plan:vPlan,shop:vShop,budget:vBudget};
+const V={stock:vStock,house:vHouse,recipes:vRecipes,budget:vBudget,weekly:()=>weekView()};
+function weekView(){
+  const cur=S.weekKey||'w0';
+  const chips=['w0','w1','w2','w3'].map(w=>`<button class="${w===cur?'b':'s'}" data-a="week-pick" data-week="${w}">${weekLabel(w)}</button>`).join(' ');
+  return `<div class="card"><p class="row">${chips}</p></div><div class="week-view">${vPlan()}${vShop()}</div>`;
+}
 
 function render(){
+  if(/^w\d$/.test(tab)&&S.weekKey!==tab) switchWeek(tab);
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
   document.getElementById("view").innerHTML=V[tab]();
   paintStatus();
@@ -1468,16 +1507,20 @@ document.addEventListener("click",e=>{
     }
     case "plan-generate": generateWeek(); break;
     case "plan-confirm": confirmWeek(); break;
+    case "week-pick": switchWeek(t.dataset.week); break;
+    case "week-this": switchWeek('this'); break;
+    case "week-next": switchWeek('next'); break;
     case "plan-clear": S.plan={}; break;
     case "shop-all": {
       S.bought=S.bought||{}; S.boughtMeta=S.boughtMeta||{}; S.stock=S.stock||[];
-      shopping().forEach(x=>{
+      shopping(planFor(t.dataset.week)).forEach(x=>{
         const dk=normN(x.name)+"|"+normU(x.unit);
         if(S.bought[dk]) return;
         S.bought[dk]=true; S.boughtMeta[dk]={name:x.name,unit:x.unit};
         const s=S.stock.find(y=>norm(y.name)===norm(x.name)&&norm(y.unit)===norm(x.unit));
         if(s) s.qty+=x.buy; else S.stock.push({id:uid0(),name:x.name,unit:x.unit,qty:x.buy,low:0});
       });
+      S.shopDone=S.shopDone||{}; S.shopDone[t.dataset.week]=new Date().toLocaleDateString('en-GB');
       break;
     }
     case "shop-bought": {
