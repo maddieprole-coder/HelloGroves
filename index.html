@@ -460,6 +460,7 @@ function seedPantry(){
   fixWeeksV2();
   fixVariety2();
   fixNoCouscous();
+  fixNoReady();
   purgeSideSalad();
   fixLambMince();
   if(S.pantrySeeded) return;
@@ -1072,6 +1073,17 @@ METHODS["Lemon and garlic chicken with rice"]=["Rinse the rice and cook it for 1
 /*MORE*/
 const FIXED_NAMES=["Chicken nuggets and chips","Pizza night"];
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function isReadyMeal(r){
+  return (r.ingredients||[]).some(i=>/ready|nugget|fish finger|spring roll|samosa|dumpling|sausage roll|frozen chips/i.test(i.name||''))||/nugget|ready/i.test(r.name||'');
+}
+function fixNoReady(){
+  if(S.noReady) return;
+  const bad=new Set((S.recipes||[]).filter(r=>isReadyMeal(r)&&!FIXED_NAMES.includes(r.name)).map(r=>r.id));
+  const clean=pl=>{ Object.keys(pl||{}).forEach(d=>{ if(pl[d]&&bad.has(pl[d].recipeId)&&d!=='Fri'&&d!=='Sat') delete pl[d]; }); };
+  clean(S.plan);
+  Object.values(S.weekPlans||{}).forEach(clean);
+  S.noReady=true;
+}
 function generateWeek(){
   S.bought={};
   const cooked=DAYS.filter(d=>S.plan[d]&&S.plan[d].cooked);
@@ -1086,7 +1098,7 @@ function generateWeek(){
     ...Object.values(S.plan||{}).map(p=>p&&p.recipeId),
     ...Object.values(S.weekPlans||{}).flatMap(pl=>Object.values(pl||{}).map(p=>p&&p.recipeId))
   ].filter(Boolean));
-  const basePool=S.recipes.filter(r=>!used.has(r.id)&&r.carb!=="Bread"&&!FIXED_NAMES.includes(r.name)&&!(r.ingredients||[]).some(i=>/leek|\bham\b|pak choi/i.test(i.name)));
+  const basePool=S.recipes.filter(r=>!used.has(r.id)&&r.carb!=="Bread"&&!FIXED_NAMES.includes(r.name)&&!isReadyMeal(r)&&!(r.ingredients||[]).some(i=>/leek|\bham\b|pak choi/i.test(i.name)));
   const freshPool=basePool.filter(r=>!recent.has(r.id));
   const pool=shuffle(freshPool.length>=open.length?freshPool:basePool);
   if(!pool.length){ note("Add some recipes first."); return; }
