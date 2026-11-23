@@ -276,6 +276,108 @@ function seedBatch7(){
   });
   S.pantrySeeded7=true;
 }
+function fixNuggets(){
+  if(S.nuggetsFixed) return;
+  const r=(S.recipes||[]).find(x=>normN(x.name)==="chicken nuggets and chips");
+  if(r){ r.ingredients=parseIng("Ready-made chicken nuggets 500 g; frozen chips 750 g"); r.steps=["Heat the air fryer to 200C.","Put the frozen chips in the basket in a single layer and cook for 15 to 18 minutes, shaking halfway.","Add the nuggets on top of the chips, or in a separate basket, and cook for 10 to 12 minutes until piping hot all the way through.","Check the nuggets are steaming in the middle, then serve."]; r.stepsV=2; r.nut="Check nugget and chip labels"; }
+  S.nuggetsFixed=true;
+}
+function fixYoghurt2(){
+  if(S.yoghurtFixed2) return;
+  const s=(S.stock||[]).find(x=>normN(x.name)==="greek yoghurt");
+  if(s) s.need=1000;
+  S.yoghurtFixed2=true;
+}
+function fixChickenLeftover(){
+  if(S.chickenLeftover) return;
+  S.stock=S.stock||[];
+  if(!S.stock.some(s=>normN(s.name)==="chicken breast"&&normU(s.unit)==="g")) S.stock.push({id:uid0(),name:"chicken breast",qty:500,unit:"g",low:0});
+  S.chickenLeftover=true;
+}
+function fixPdfWeek(){
+  if(S.pdfWeek) return;
+  const R=[
+    {name:'Sausage and pepper rigatoni',carb:'Pasta',method:'Hob',min:20,cost:9,nut:'None expected',ing:'Rigatoni 400 g; pork sausages 6 each; bell pepper 2 each; passata 400 g; garlic granules 4 g; mozzarella 125 g',steps:['Fill a large pan with salted water and bring it to the boil.','While the water heats, slice the sausages into chunks and the peppers into strips.','Add the rigatoni to the water and cook for 11 minutes.','While the pasta cooks, fry the sausage for 6 minutes until browned.','Add the peppers and garlic granules for 4 minutes, then the passata.','Simmer for 5 minutes, then drain the rigatoni.','Toss the pasta through the sauce and scatter with torn mozzarella.']},
+    {name:'Chicken yakitori rice',carb:'Rice',method:'Hob',min:20,cost:10,nut:'Check yakitori sauce label',ing:'Rice 300 g; chicken thighs 500 g; yakitori sauce 4 tbsp; spring onions 3 each; sesame seeds 1 tbsp',steps:['Rinse the rice and cook it for 12 minutes.','While the rice cooks, cut the chicken into bite-sized pieces and slice the spring onions.','Fry the chicken for 8 minutes until cooked through.','Add the yakitori sauce and cook 2 minutes until sticky.','Fluff the rice and spoon into bowls.','Top with chicken, spring onions and sesame seeds.']},
+    {name:'Chilli garlic prawn rice',carb:'Rice',method:'Hob',min:15,cost:11,nut:'None expected',ing:'King prawns 400 g; rice 300 g; red chillies 2 each; garlic granules 6 g; lime 1 each; spring onions 3 each',steps:['Rinse the rice and cook it for 12 minutes.','While the rice cooks, slice the chillies, crush the garlic granules and cut the lime.','Fry the garlic granules and chillies for 1 minute.','Add the prawns and cook 3 minutes until pink.','Fluff the rice and spoon the prawns on top.','Finish with lime and spring onions.']},
+    {name:'Crispy chicken and smashed potatoes',carb:'Potato',method:'Air fryer',min:22,cost:9,nut:'None expected',ing:'Chicken breast 500 g; baby potatoes 800 g; oil 2 tbsp; rosemary 1 tsp; garlic granules 4 g',steps:['Boil the baby potatoes for 10 minutes, then drain.','Smash them, toss in oil, rosemary and garlic granules, and air-fry at 200C for 12 minutes.','Air-fry the chicken breast for 12 minutes until cooked through.','Slice the chicken and serve with the potatoes.']},
+    {name:'Spicy sausage arrabbiata',carb:'Pasta',method:'Hob',min:20,cost:8,nut:'None expected',ing:'Penne 400 g; pork sausages 6 each; chopped tomatoes 2 tin; chilli flakes 1 tsp; garlic granules 4 g; parmesan 40 g',steps:['Fill a large pan with salted water and bring it to the boil.','While the water heats, slice the sausages and crush the garlic granules.','Add the penne to the water and cook for 10 minutes.','While the pasta cooks, fry the sausage for 6 minutes, breaking it up.','Add the garlic granules, chilli flakes and tomatoes and simmer for 8 minutes.','Drain the penne and toss through the sauce.','Serve with parmesan.']}
+  ];
+  S.recipes=S.recipes||[];
+  const byName=n=>S.recipes.find(y=>normN(y.name)===normN(n));
+  R.forEach(x=>{
+    let r=byName(x.name);
+    if(!r){ r={id:uid0(),name:x.name,servings:4,cost:x.cost,prep:0,cook:x.min,carb:x.carb,method:x.method,nut:x.nut,ingredients:[],steps:[]}; S.recipes.push(r); }
+    Object.assign(r,{carb:x.carb,method:x.method,cook:x.min,cost:x.cost,nut:x.nut,ingredients:parseIng(x.ing),steps:x.steps,stepsV:2});
+  });
+  S.plan=S.plan||{};
+  const set=(d,n)=>{ const r=byName(n); if(r&&!(S.plan[d]&&S.plan[d].cooked)) S.plan[d]={recipeId:r.id,cooked:false}; };
+  set('Mon','Sausage and pepper rigatoni');
+  set('Tue','Chicken yakitori rice');
+  set('Wed','Chilli garlic prawn rice');
+  set('Thu','Crispy chicken and smashed potatoes');
+  set('Fri','Chicken nuggets and chips');
+  set('Sat','Pizza night');
+  set('Sun','Spicy sausage arrabbiata');
+  S.pdfWeek=true;
+}
+function fixPdfSauce(){
+  if(S.pdfSauce) return;
+  const U={
+    'Chicken yakitori rice':{cost:11,ing:'Rice 300 g; chicken thighs 500 g; yakitori sauce 4 tbsp; soy sauce 2 tbsp; honey 1 tbsp; garlic granules 2 g; vegetable oil 1 tbsp; spring onions 3 each; sesame seeds 1 tbsp',steps:['Rinse the rice and cook it for 12 minutes.','While the rice cooks, cut the chicken into bite-sized pieces and slice the spring onions.','Toss the chicken with the soy sauce, honey and garlic granules and leave for 5 minutes.','Fry the chicken in the oil for 8 minutes until golden and cooked through.','Pour in the yakitori sauce and cook for 2 minutes, stirring, until thick and sticky.','Fluff the rice and spoon into bowls.','Top with the glazed chicken, spring onions and sesame seeds.']},
+    'Chilli garlic prawn rice':{cost:12,ing:'Rice 300 g; king prawns 400 g; red chillies 2 each; garlic granules 6 g; butter 25 g; sweet chilli sauce 4 tbsp; soy sauce 1 tbsp; lime 1 each; spring onions 3 each',steps:['Rinse the rice and cook it for 12 minutes.','While the rice cooks, slice the chillies, crush the garlic granules and cut the lime into wedges.','Melt the butter in a pan and fry the chillies and garlic granules for 1 minute.','Add the prawns and cook for 2 minutes each side until pink.','Stir in the sweet chilli sauce and soy sauce and cook for 1 minute until glossy.','Fluff the rice and spoon the prawns and sauce on top.','Finish with a squeeze of lime and the spring onions.']}
+  };
+  (S.recipes||[]).forEach(r=>{ const u=U[Object.keys(U).find(k=>normN(k)===normN(r.name))]; if(u){ r.ingredients=parseIng(u.ing); r.steps=u.steps; r.stepsV=2; r.cost=u.cost; } });
+  S.pdfSauce=true;
+}
+function fixSweetSour(){
+  if(S.sweetSour) return;
+  const r=(S.recipes||[]).find(y=>['chicken yakitori rice','sweet and sour chicken rice'].includes(normN(y.name)));
+  if(r){
+    Object.assign(r,{name:'Sweet and sour chicken rice',carb:'Rice',method:'Hob',cook:20,cost:11,nut:'Check sweet and sour sauce label',ingredients:parseIng('Rice 300 g; chicken breast 500 g; cornflour 2 tbsp; vegetable oil 2 tbsp; bell pepper 2 each; pineapple chunks 220 g; sweet and sour sauce 6 tbsp; soy sauce 1 tbsp; spring onions 3 each'),steps:['Rinse the rice and cook it for 12 minutes.','While the rice cooks, cut the chicken into bite-sized chunks and slice the peppers and spring onions.','Toss the chicken in the cornflour until coated.','Fry the chicken in the oil for 6 minutes until golden and cooked through, then set aside.','Fry the peppers for 3 minutes, add the pineapple, then stir in the sweet and sour sauce and soy sauce.','Simmer for 2 minutes, then return the chicken and toss to coat.','Fluff the rice, spoon into bowls, and top with the chicken, sauce and spring onions.'],stepsV:2});
+  }
+  S.sweetSour=true;
+}
+function fixReadySweetSour(){
+  if(S.readySweetSour) return;
+  const r=(S.recipes||[]).find(y=>normN(y.name)===normN('Sweet and sour chicken rice'));
+  if(r){
+    Object.assign(r,{ingredients:parseIng('Rice 300 g; chicken breast 500 g; cornflour 2 tbsp; vegetable oil 2 tbsp; bell pepper 2 each; pineapple chunks 220 g; sweet and sour sauce 300 g'),steps:['Rinse the rice and cook it for 12 minutes.','While the rice cooks, cut the chicken into bite-sized chunks and slice the peppers.','Toss the chicken in the cornflour until coated.','Fry the chicken in the oil for 6 minutes until golden and cooked through, then set aside.','Fry the peppers for 3 minutes, add the pineapple and the ready-made sweet and sour sauce, and simmer for 2 minutes.','Return the chicken to the pan and toss to coat.','Fluff the rice, spoon into bowls, and top with the chicken and sauce.'],stepsV:2});
+  }
+  S.stock=S.stock||[];
+  if(!S.stock.some(s=>normN(s.name)===normN('sweet and sour sauce')&&normU(s.unit)===normU('g'))) S.stock.push({id:uid0(),name:'sweet and sour sauce',qty:300,unit:'g',low:0});
+  S.readySweetSour=true;
+}
+function fixNoPineapple(){
+  if(S.noPineapple) return;
+  const r=(S.recipes||[]).find(y=>normN(y.name)===normN('Sweet and sour chicken rice'));
+  if(r){
+    Object.assign(r,{ingredients:parseIng('Rice 300 g; chicken breast 500 g; cornflour 2 tbsp; vegetable oil 2 tbsp; bell pepper 2 each; sweet and sour sauce 300 g'),steps:['Rinse the rice and cook it for 12 minutes.','While the rice cooks, cut the chicken into bite-sized chunks and slice the peppers.','Toss the chicken in the cornflour until coated.','Fry the chicken in the oil for 6 minutes until golden and cooked through, then set aside.','Fry the peppers for 3 minutes, then add the ready-made sweet and sour sauce and simmer for 2 minutes.','Return the chicken to the pan and toss to coat.','Fluff the rice, spoon into bowls, and top with the chicken and sauce.'],stepsV:2});
+  }
+  S.noPineapple=true;
+}
+function fixPrawnStock(){
+  if(S.prawnStock) return;
+  const r=(S.recipes||[]).find(y=>normN(y.name)===normN('Chilli garlic prawn rice'));
+  if(r){
+    Object.assign(r,{cost:9,nut:'Check red chilli relish and soy sauce labels',ingredients:parseIng('Rice 300 g; king prawns 400 g; sesame oil 1 tbsp; garlic granules 6 g; chilli and garlic seasoning 1 each; red chilli relish 25 g; soy sauce 10 ml; honey 1 tsp; spring onions 3 each'),steps:['Rinse the rice and cook it for 12 minutes.','While the rice cooks, slice the spring onions.','Heat the sesame oil in a pan and fry the garlic granules and chilli and garlic seasoning for 1 minute.','Add the prawns and cook for 2 minutes each side until pink.','Stir in the red chilli relish, soy sauce and honey and cook for 1 minute until glossy.','Fluff the rice and spoon the prawns and sauce on top.','Finish with the spring onions.'],stepsV:2});
+  }
+  S.prawnStock=true;
+}
+function fixPrawnOil(){
+  if(S.prawnOil) return;
+  const r=(S.recipes||[]).find(y=>normN(y.name)===normN('Chilli garlic prawn rice'));
+  if(r){ r.ingredients=parseIng('Rice 300 g; king prawns 400 g; vegetable oil 1 tbsp; garlic granules 6 g; chilli and garlic seasoning 1 each; red chilli relish 25 g; soy sauce 10 ml; honey 1 tsp; spring onions 3 each'); r.steps=r.steps.map(s=>s.replace(/sesame oil/gi,'vegetable oil')); r.stepsV=2; }
+  S.prawnOil=true;
+}
+function fixWeeklySnacks(){
+  if(S.weeklySnacks) return;
+  S.stock=S.stock||[];
+  const add=(name,unit,need,cat)=>{ if(!S.stock.some(s=>normN(s.name)===normN(name)&&normU(s.unit)===normU(unit))) S.stock.push({id:uid0(),name,unit,qty:0,low:0,cat,need}); };
+  add('apples','each',6,'Fruit');
+  add('multipack crisps','pack',1,'Sweet treats');
+  S.weeklySnacks=true;
+}
 function fixPop(){
   if(S.popFixed) return;
   const s=(S.stock||[]).find(x=>normN(x.name)==="pop");
@@ -298,6 +400,17 @@ function seedPantry(){
   fixWeekly3();
   seedBatch7();
   fixPop();
+  fixNuggets();
+  fixYoghurt2();
+  fixChickenLeftover();
+  fixPdfWeek();
+  fixPdfSauce();
+  fixSweetSour();
+  fixReadySweetSour();
+  fixNoPineapple();
+  fixPrawnStock();
+  fixPrawnOil();
+  fixWeeklySnacks();
   purgeSideSalad();
   fixLambMince();
   if(S.pantrySeeded) return;
@@ -558,7 +671,7 @@ function vShop(){
       <td><input type="number" step="0.01" min="0" placeholder="£ paid" data-a="actual" data-name="${esc(x.name)}" data-unit="${esc(x.unit)}" data-buy="${x.buy}" style="width:90px"></td>
       <td><button class="s" data-a="shop-bought" data-name="${esc(x.name)}" data-unit="${esc(u)}" data-buy="${q}" data-key="${dk}">Bought</button> <span class="note">adds ${q} ${esc(u)}</span></td></tr>`;
   }).join("");
-  return `<div class="card shop"><h2>Shopping list</h2>
+  return `<div class="card shop"><h2>Shopping list <button class="s" data-a="shop-all">Already shopped: add whole list to stock</button></h2>
     <table><thead><tr><th>Item</th><th>Needed</th><th>In stock</th><th>To buy</th><th>Est. cost (shelf price)</th><th>Actual paid (£)</th><th></th></tr></thead>
     <tbody>${listRows||'<tr><td colspan="7" class="muted">Nothing to buy. Your stock covers the plan, or no dinners are planned.</td></tr>'}</tbody></table>
     <p class="row"><strong>Estimated shop: ${totalBand(list.filter(x=>x.buy>0))}</strong></p><p class="note">“Bought” adds the whole pack to stock, so anything left over stays in stock for later meals. Anything marked low is topped up to one spare pack. Prices are rough Tesco-style estimates, not live shelf prices. Type what you paid in Actual paid (for the whole line) and future estimates for that item use your price. Items with no price show as pantry or not priced.</p></div>`;
@@ -686,7 +799,7 @@ const NEW_R=[
 ["Sausage, egg and bean fry-up","Potato","Hob",20,"Pork sausages 6; potatoes 800 g; eggs 4; smoked bacon 100 g; baked beans 1 tin","Check baked beans label",7.50],
 ["Steak and mushroom mash","Potato","Hob",25,"Sirloin steaks 4 (about 500 g); mushrooms 250 g; potatoes 1000 g; butter 60 g; milk 100 ml; beef stock cube 1","Check stock cube label",13.00],
 ["Salmon fish cakes (air fryer)","Potato","Air fryer",25,"Salmon fillets 2; potatoes 800 g; egg 1; breadcrumbs 80 g; dill 1 tsp; lemon 1","None expected",9.00],
-["Chicken nuggets and chips","Potato","Air fryer",25,"Chicken breast 500 g; panko breadcrumbs 100 g; eggs 2; plain flour 50 g; potatoes 1000 g","None expected",8.50],
+["Chicken nuggets and chips","Potato","Air fryer",20,"Ready-made chicken nuggets 500 g; frozen chips 750 g","Check nugget and chip labels",4.50],
 ["Chicken brioche burgers","Bread","Hob",20,"Chicken breast 500 g; brioche buns 4; lettuce 1; mayonnaise 4 tbsp; cheese slices 4; tomatoes 2","Check mayonnaise label",9.00],
 ["Pork and apple brioche burgers","Bread","Hob",20,"Pork mince 500 g; brioche buns 4; eating apple 1; sage 1 tsp; red onion 1; mayonnaise 4 tbsp","Check mayonnaise label",9.00],
 ["Chicken Caesar wraps","Bread","Hob",15,"Chicken breast 500 g; tortilla wraps 4; romaine lettuce 1; Caesar dressing 4 tbsp; parmesan 40 g","Check dressing label",8.50],
@@ -799,7 +912,7 @@ METHODS["Turkey burgers with fries (air fryer)"]=["Cut the potatoes into fries a
 METHODS["Sausage, egg and bean fry-up"]=["Boil the potatoes in cubes for 6 minutes, then fry until golden.","Fry the sausages and bacon for 8 minutes.","Warm the beans in a pan for 3 minutes.","Fry the eggs and serve everything together."];
 METHODS["Steak and mushroom mash"]=["Boil the potatoes for 12 minutes, then mash with butter and milk.","Sear the steaks 2 to 3 minutes each side, then rest.","Fry the mushrooms in the same pan for 4 minutes with the stock cube.","Serve the steak and mushrooms on the mash."];
 METHODS["Salmon fish cakes (air fryer)"]=["Boil the potatoes for 12 minutes, then mash.","Mix in the flaked cooked salmon, egg, dill and lemon zest.","Shape into cakes, coat in breadcrumbs, and air-fry at 200C for 12 minutes.","Serve with lemon wedges."];
-METHODS["Chicken nuggets and chips"]=["Cut the potatoes into chips and air-fry at 200C for 15 minutes.","Cut the chicken into bites, coat in flour, egg and panko.","Air-fry the nuggets at 200C for 10 minutes until golden and cooked.","Serve with the chips."];
+METHODS["Chicken nuggets and chips"]=["Heat the air fryer to 200C.","Put the frozen chips in the basket in a single layer and cook for 15 to 18 minutes, shaking halfway.","Add the nuggets on top of the chips, or in a separate basket, and cook for 10 to 12 minutes until piping hot all the way through.","Check the nuggets are steaming in the middle, then serve."];
 METHODS["Chicken and leek mash bowl"]=["Boil the potatoes for 12 minutes, then mash with butter and milk.","Fry the chicken for 6 minutes, then add the sliced leeks for 4 minutes.","Stir in the stock and cream and simmer 3 minutes.","Serve the chicken over the mash."];
 METHODS["Chicken brioche burgers"]=["Season and shape the chicken mince into patties.","Fry the patties for 5 minutes each side until cooked through.","Toast the brioche buns in the pan for 1 minute.","Build with mayonnaise, lettuce, tomato and cheese."];
 METHODS["Pork and apple brioche burgers"]=["Mix the pork mince with grated apple and sage, and shape into patties.","Fry the patties for 5 minutes each side until cooked through.","Toast the buns and slice the red onion.","Build with mayonnaise and onion."];
@@ -1199,6 +1312,7 @@ async function confirmWeek(){
   let downloads=null;
   try{ downloads=window.claude?await window.claude.use("downloads"):null; }catch(e){}
   note("Making your menu..."); paintStatus();
+  days.splice(0,days.length,...days.filter(x=>!['Chicken nuggets and chips','Pizza night'].includes(x.r.name)));
   try{
     const html=`<!DOCTYPE html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>This week's dinners</title><style>${MENU_CSS3}</style></head><body>${days.map(({full,r})=>recipeCardHTML3(full,r)).join("")}</body></html>`;
     const w=window.open("","_blank");
@@ -1355,6 +1469,17 @@ document.addEventListener("click",e=>{
     case "plan-generate": generateWeek(); break;
     case "plan-confirm": confirmWeek(); break;
     case "plan-clear": S.plan={}; break;
+    case "shop-all": {
+      S.bought=S.bought||{}; S.boughtMeta=S.boughtMeta||{}; S.stock=S.stock||[];
+      shopping().forEach(x=>{
+        const dk=normN(x.name)+"|"+normU(x.unit);
+        if(S.bought[dk]) return;
+        S.bought[dk]=true; S.boughtMeta[dk]={name:x.name,unit:x.unit};
+        const s=S.stock.find(y=>norm(y.name)===norm(x.name)&&norm(y.unit)===norm(x.unit));
+        if(s) s.qty+=x.buy; else S.stock.push({id:uid0(),name:x.name,unit:x.unit,qty:x.buy,low:0});
+      });
+      break;
+    }
     case "shop-bought": {
       S.bought=S.bought||{}; S.bought[t.dataset.key]=true; S.boughtMeta=S.boughtMeta||{}; S.boughtMeta[t.dataset.key]={name:t.dataset.name,unit:t.dataset.unit};
       const name=t.dataset.name, unit=t.dataset.unit, q=+t.dataset.buy||0;
