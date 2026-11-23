@@ -387,6 +387,43 @@ function fixWeeksV2(){
   S.weekKey=cur;
   S.weeksV2=true;
 }
+function fixVariety2(){
+  if(S.variety2) return;
+  S.recipes=S.recipes||[];
+  const R=[
+    {n:'Thai green chicken curry',c:'Rice',m:'Hob',t:20,p:11,nut:'Check curry paste label',i:'Rice 300 g; chicken thighs 500 g; green curry paste 3 tbsp; coconut milk 400 ml; fish sauce 1 tbsp; sugar snap peas 150 g; lime 1 each',s:['Rinse the rice and cook it for 12 minutes.','While the rice cooks, cut the chicken into bite-sized pieces and trim the sugar snap peas.','Fry the curry paste in a dry pan for 1 minute, then add the chicken and cook for 5 minutes.','Pour in the coconut milk and fish sauce and simmer for 6 minutes.','Add the sugar snap peas for 2 minutes.','Serve over the rice with a squeeze of lime.']},
+    {n:'Korean beef bulgogi bowls',c:'Rice',m:'Hob',t:20,p:12,nut:'Check soy sauce label',i:'Rice 300 g; beef strips 500 g; soy sauce 3 tbsp; honey 1 tbsp; garlic granules 4 g; vegetable oil 1 tbsp; cucumber 1 each; spring onions 3 each',s:['Rinse the rice and cook it for 12 minutes.','Toss the beef with the soy sauce, honey and garlic granules and leave for 5 minutes.','Slice the cucumber into thin batons and the spring onions into rings.','Fry the beef in the hot oil in two batches for 3 minutes each until caramelised.','Spoon the rice into bowls and top with the beef.','Add the cucumber and spring onions to finish.']},
+    {n:'Salmon teriyaki with rice',c:'Rice',m:'Air fryer',t:18,p:12,nut:'Check teriyaki sauce label',i:'Rice 300 g; salmon fillets 4 each; soy sauce 4 tbsp; honey 2 tbsp; garlic granules 2 g; cucumber 1 each; spring onions 2 each',s:['Rinse the rice and cook it for 12 minutes.','Mix the soy sauce, honey and garlic granules in a bowl.','Brush the salmon fillets with half the sauce.','Air-fry the salmon at 200C for 8 minutes until just cooked through.','Slice the cucumber and spring onions while the salmon cooks.','Serve the salmon on the rice with the cucumber, spring onions and the rest of the sauce.']},
+    {n:'Beef and broccoli noodles',c:'Noodles',m:'Hob',t:15,p:10,nut:'Check oyster sauce label',i:'Egg noodles 300 g; beef strips 400 g; broccoli 250 g; soy sauce 3 tbsp; oyster sauce 1 tbsp; cornflour 1 tsp; vegetable oil 1 tbsp; garlic granules 2 g',s:['Boil the noodles for 4 minutes, then drain.','Toss the beef with the cornflour.','Fry the beef in the oil for 3 minutes until browned.','Add the broccoli with a splash of water and cook for 3 minutes.','Stir in the soy sauce, oyster sauce and garlic granules.','Toss through the noodles and serve.']},
+    {n:'Chicken fajita wraps',c:'Wrap',m:'Hob',t:20,p:10,nut:'Check wrap label',i:'Wraps 8 each; chicken breast 500 g; fajita seasoning 1 each; red pepper 2 each; onion 1 each; sour cream 150 g; lime 1 each; lettuce 1 each; vegetable oil 1 tbsp',s:['Slice the chicken, peppers and onion into thin strips.','Toss the chicken with the fajita seasoning and oil.','Fry the chicken for 6 minutes until cooked through, then set aside.','Fry the peppers and onion for 5 minutes until soft and charred.','Warm the wraps in a dry pan for 1 minute each.','Fill with the chicken, peppers, lettuce and sour cream, and finish with lime.']},
+    {n:'Honey garlic prawn noodles',c:'Noodles',m:'Hob',t:15,p:10,nut:'None expected',i:'Egg noodles 250 g; king prawns 400 g; honey 2 tbsp; soy sauce 3 tbsp; garlic granules 4 g; spring onions 3 each; vegetable oil 1 tbsp',s:['Boil the noodles for 4 minutes, then drain.','Fry the prawns in the oil for 2 minutes each side until pink.','Add the honey, soy sauce and garlic granules and cook for 1 minute until glossy.','Toss the noodles through the prawns.','Scatter with spring onions and serve.']},
+    {n:'Air fryer cod tacos',c:'Wrap',m:'Air fryer',t:20,p:10,nut:'Check tortilla label',i:'Tortillas 8 each; cod fillets 500 g; cornflour 2 tbsp; smoked paprika 1 tsp; red cabbage 150 g; sour cream 150 g; lime 1 each; vegetable oil 1 tbsp',s:['Pat the cod dry and toss in the cornflour and smoked paprika.','Brush with the oil and air-fry at 200C for 10 minutes until flaky.','Shred the red cabbage finely.','Warm the tortillas in a dry pan for 1 minute each.','Flake the cod into the tortillas.','Top with cabbage, sour cream and a squeeze of lime.']},
+    {n:'Sausage and mash with onion gravy',c:'Potato',m:'Hob',t:25,p:8,nut:'Check sausage label',i:'Pork sausages 6 each; potatoes 800 g; butter 25 g; milk 100 ml; onion 1 each; beef stock cube 1 each; cornflour 1 tsp',s:['Peel and chop the potatoes, then boil for 15 minutes.','While they boil, fry the sausages and sliced onion for 10 minutes until golden.','Crumble the stock cube into 300 ml hot water and add to the pan with the cornflour.','Simmer the gravy for 3 minutes until thick.','Drain and mash the potatoes with the butter and milk.','Serve the sausages and onion gravy over the mash.']},
+    {n:'Lamb kofta couscous',c:'Couscous',m:'Air fryer',t:20,p:12,nut:'None expected',i:'Lamb mince 500 g; couscous 250 g; ground cumin 1 tsp; smoked paprika 1 tsp; greek yoghurt 150 g; cucumber 1 each; lemon 1 each; chicken stock cube 1 each',s:['Dissolve the stock cube in 300 ml boiling water and pour over the couscous.','Cover and leave for 5 minutes, then fluff with a fork.','Mix the lamb with the cumin, paprika and a pinch of salt, then shape into 8 koftas.','Air-fry the koftas at 200C for 10 minutes, turning halfway.','Dice the cucumber and mix into the yoghurt with lemon juice.','Serve the koftas on the couscous with the yoghurt.']},
+    {n:'Chicken katsu curry',c:'Rice',m:'Air fryer',t:22,p:11,nut:'Check katsu sauce label',i:'Rice 300 g; chicken breast 500 g; plain flour 2 tbsp; egg 2 each; breadcrumbs 75 g; curry sauce 300 ml; vegetable oil 1 tbsp',s:['Rinse the rice and cook it for 12 minutes.','Cut the chicken into thick strips.','Dip each strip in flour, then beaten egg, then breadcrumbs.','Spray or brush with oil and air-fry at 200C for 10 minutes until golden.','Heat the curry sauce in a pan for 3 minutes.','Serve the katsu on the rice with the curry sauce spooned over.']},
+    {n:'Bacon and pea pasta',c:'Pasta',m:'Hob',t:15,p:8,nut:'None expected',i:'Penne 400 g; bacon lardons 200 g; frozen peas 150 g; double cream 150 ml; parmesan 40 g; garlic granules 2 g',s:['Fill a large pan with salted water and bring it to the boil.','Add the penne and cook for 10 minutes.','Fry the lardons for 5 minutes until crisp.','Add the garlic granules and peas and cook for 2 minutes.','Stir in the cream and simmer for 1 minute.','Drain the pasta, toss through the sauce and top with grated parmesan.']},
+    {n:'Chicken and chorizo rice',c:'Rice',m:'Hob',t:22,p:10,nut:'Check chorizo label',i:'Rice 300 g; chicken thighs 400 g; chorizo 100 g; chicken stock cube 1 each; red pepper 1 each; frozen peas 100 g; smoked paprika 1 tsp; vegetable oil 1 tbsp',s:['Cut the chicken into chunks and slice the chorizo and pepper.','Fry the chicken, chorizo and paprika in the oil for 6 minutes.','Add the pepper and cook for 2 minutes.','Stir in the rice and pour over 600 ml stock made from the cube.','Cover and simmer for 12 minutes until the rice is tender.','Stir in the peas for the final 3 minutes.']},
+    {n:'Air fryer fish and chips',c:'Potato',m:'Air fryer',t:22,p:10,nut:'Check breadcrumb label',i:'Cod fillets 4 each; potatoes 800 g; breadcrumbs 75 g; egg 1 each; plain flour 2 tbsp; vegetable oil 1 tbsp; lemon 1 each; frozen peas 150 g',s:['Cut the potatoes into chips and toss in the oil.','Air-fry the chips at 200C for 15 minutes, shaking halfway.','Dip the cod in flour, then beaten egg, then breadcrumbs.','Add the cod to the basket for the final 10 minutes until crisp.','Boil the peas for 3 minutes.','Serve with lemon wedges.']},
+    {n:'Beef burrito bowls',c:'Rice',m:'Hob',t:20,p:10,nut:'Check fajita seasoning label',i:'Rice 300 g; beef mince 500 g; fajita seasoning 1 each; sweetcorn 1 tin; tomato 2 each; sour cream 150 g; lime 1 each; vegetable oil 1 tbsp',s:['Rinse the rice and cook it for 12 minutes.','Fry the beef mince in the oil for 5 minutes until browned.','Stir in the fajita seasoning and a splash of water.','Add the sweetcorn and cook for 3 minutes.','Chop the tomatoes and squeeze the lime.','Spoon the rice into bowls, top with the beef, tomato and sour cream.']},
+    {n:'Prawn fried rice',c:'Rice',m:'Hob',t:15,p:9,nut:'Check soy sauce label',i:'Rice 300 g; king prawns 300 g; egg 2 each; frozen peas 100 g; soy sauce 3 tbsp; vegetable oil 1 tbsp; spring onions 3 each',s:['Cook the rice for 12 minutes and spread it out to cool slightly.','Fry the prawns in the oil for 2 minutes until pink, then set aside.','Scramble the eggs in the pan for 1 minute.','Add the rice, peas and soy sauce and fry for 3 minutes.','Return the prawns and toss for 1 minute.','Scatter with spring onions.']},
+    {n:'Lemon herb chicken couscous',c:'Couscous',m:'Hob',t:15,p:9,nut:'None expected',i:'Couscous 250 g; chicken breast 500 g; lemon 1 each; dried oregano 1 tsp; butter 25 g; cucumber 1 each; tomato 2 each; chicken stock cube 1 each',s:['Dissolve the stock cube in 300 ml boiling water and pour over the couscous.','Cover and leave for 5 minutes, then fluff with a fork.','Slice the chicken and toss with the oregano and lemon juice.','Fry the chicken in the butter for 6 minutes until cooked through.','Dice the cucumber and tomato.','Serve the chicken on the couscous with the vegetables.']}
+  ];
+  R.forEach(x=>{
+    if(S.recipes.some(r=>normN(r.name)===normN(x.n))) return;
+    S.recipes.push({id:uid0(),name:x.n,servings:4,cost:x.p,prep:0,cook:x.t,carb:x.c,method:x.m,nut:x.nut,ingredients:parseIng(x.i),steps:x.s,stepsV:2});
+  });
+  S.variety2=true;
+}
+function fixNoCouscous(){
+  if(S.noCouscous) return;
+  const bad=r=>r.carb==='Couscous'||/green curry/i.test(r.name||'');
+  const ids=new Set((S.recipes||[]).filter(bad).map(r=>r.id));
+  S.recipes=(S.recipes||[]).filter(r=>!bad(r));
+  const clean=pl=>{ Object.keys(pl||{}).forEach(d=>{ if(pl[d]&&ids.has(pl[d].recipeId)) delete pl[d]; }); };
+  clean(S.plan);
+  Object.values(S.weekPlans||{}).forEach(clean);
+  S.noCouscous=true;
+}
 function fixPop(){
   if(S.popFixed) return;
   const s=(S.stock||[]).find(x=>normN(x.name)==="pop");
@@ -421,6 +458,8 @@ function seedPantry(){
   fixPrawnOil();
   fixWeeklySnacks();
   fixWeeksV2();
+  fixVariety2();
+  fixNoCouscous();
   purgeSideSalad();
   fixLambMince();
   if(S.pantrySeeded) return;
@@ -1041,7 +1080,12 @@ function generateWeek(){
   const carbs={};
   cooked.forEach(d=>{const r=S.recipes.find(x=>x.id===S.plan[d].recipeId); if(r) carbs[r.carb]=(carbs[r.carb]||0)+1;});
   const cutoff=new Date(Date.now()-21*864e5).toISOString().slice(0,10);
-  const recent=new Set((S.history||[]).filter(h=>h.date>=cutoff).map(h=>h.recipeId));
+  const recent=new Set([
+    ...(S.history||[]).filter(h=>h.date>=cutoff).map(h=>h.recipeId),
+    ...(S.recentPicks||[]).filter(h=>h.date>=cutoff).map(h=>h.recipeId),
+    ...Object.values(S.plan||{}).map(p=>p&&p.recipeId),
+    ...Object.values(S.weekPlans||{}).flatMap(pl=>Object.values(pl||{}).map(p=>p&&p.recipeId))
+  ].filter(Boolean));
   const basePool=S.recipes.filter(r=>!used.has(r.id)&&r.carb!=="Bread"&&!FIXED_NAMES.includes(r.name)&&!(r.ingredients||[]).some(i=>/leek|\bham\b|pak choi/i.test(i.name)));
   const freshPool=basePool.filter(r=>!recent.has(r.id));
   const pool=shuffle(freshPool.length>=open.length?freshPool:basePool);
@@ -1058,6 +1102,8 @@ function generateWeek(){
     if(!r||(S.plan[d]&&S.plan[d].cooked)) return;
     S.plan[d]={recipeId:r.id,cooked:false}; filled++;
   });
+  const today=new Date().toISOString().slice(0,10);
+  S.recentPicks=(S.recentPicks||[]).filter(h=>h.date>=new Date(Date.now()-21*864e5).toISOString().slice(0,10)).concat(DAYS.map(d=>S.plan[d]).filter(Boolean).map(p=>({recipeId:p.recipeId,date:today})));
   note(`Generated ${filled} dinner${filled===1?'':'s'}. Cooked days were left alone.`);
 }
 const FULL_DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
