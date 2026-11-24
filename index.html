@@ -424,6 +424,229 @@ function fixNoCouscous(){
   Object.values(S.weekPlans||{}).forEach(clean);
   S.noCouscous=true;
 }
+function applyNice(map,flag){
+  if(S[flag]) return;
+  (S.recipes||[]).forEach(r=>{ if(map[r.name]&&!FIXED_NAMES.includes(r.name)){ r.steps=map[r.name]; r.stepsV=2; } });
+  S[flag]=true;
+}
+function niceB1(){
+  applyNice({
+    'Sausage and spinach orecchiette':['Boil the orecchiette in salted water for 10 minutes, and keep a mug of the cooking water.','Squeeze the sausage meat out of the skins and roll it into small balls.','Fry the sausage balls for 5 minutes until deeply golden, breaking them up as they cook.','Add the garlic and chilli flakes for 1 minute, then tip in the spinach and let it wilt.','Drain the pasta and add it to the pan with a splash of the cooking water.','Toss with most of the parmesan and serve with the rest on top.'],
+    'Bacon, pea and cream fusilli':['Boil the fusilli for 10 minutes, adding the peas for the last 2 minutes.','While the pasta cooks, fry the bacon in a dry pan until crisp and golden.','Pour the double cream into the bacon pan and let it bubble gently for 2 minutes.','Drain the pasta and peas, keeping a splash of the cooking water.','Toss everything together with the parmesan, loosening with a little water if needed.','Season with black pepper and serve straight away.'],
+    'Garlic chilli prawn linguine':['Cook the linguine in salted water for 9 minutes, then drain.','Warm the olive oil in a large pan and fry the sliced garlic and chilli for 1 minute.','Add the prawns and cook for 2 minutes until pink all the way through.','Add the lemon zest and a squeeze of juice, then toss in the linguine.','Finish with a little more oil and some black pepper, then serve.'],
+    'Quick beef ragu tagliatelle':['Brown the beef mince in a hot pan for 5 minutes, breaking it up as it cooks.','Add the finely chopped onion and grated carrot and cook for 5 minutes until softened.','Stir in the tomato purée and crumble in the stock cube for 1 minute.','Pour in the chopped tomatoes and simmer for 12 minutes until thick and glossy.','Meanwhile, cook the tagliatelle for 10 minutes and drain.','Toss the pasta through the ragu and serve.'],
+    'Smoked salmon and dill linguine':['Cook the pasta for 10 minutes and drain, keeping a splash of the water.','Pan-fry the salmon fillets for 4 minutes each side, then flake them into large chunks.','Warm the crème fraîche with the lemon zest and a squeeze of juice over a low heat.','Add the pasta and salmon and toss for 1 minute until just warmed through.','Scatter over the chopped dill and serve.'],
+    'Cajun chicken penne':['Cook the penne for 10 minutes, then drain.','Toss the sliced chicken thighs in the Cajun seasoning and fry for 6 minutes until cooked through.','Add the sliced red pepper and garlic and cook for 3 minutes.','Pour in the double cream and simmer for 2 minutes until it coats the back of a spoon.','Toss the penne through the sauce and serve.'],
+    'Pepperoni and mozzarella rigatoni':['Cook the rigatoni for 11 minutes and drain.','Fry the pepperoni for 2 minutes until its oil releases and the edges crisp.','Add the sliced garlic for 1 minute, then pour in the chopped tomatoes and simmer for 5 minutes.','Toss the rigatoni through the sauce.','Tear over the mozzarella and let it soften into the sauce before serving.'],
+    'Chicken tikka penne':['Cook the penne for 10 minutes and drain.','Fry the chicken chunks with the tikka paste for 6 minutes until cooked through.','Add the chopped onion and cook for 3 minutes until softened.','Stir in the natural yoghurt and spinach over a low heat until the spinach wilts.','Toss the penne through the sauce and serve.'],
+    'Cheeseburger macaroni':['Cook the macaroni for 8 minutes and drain.','Brown the beef mince with the chopped onion for 6 minutes, breaking it up.','Stir in the passata and simmer for 4 minutes.','Add the macaroni and half the cheddar and stir until melted.','Chop the gherkins and scatter them over with the rest of the cheddar.'],
+    'Tuna and sweetcorn fusilli':['Cook the fusilli for 10 minutes and drain.','Fry the crushed garlic for 1 minute, then add the chopped tomatoes and simmer for 5 minutes.','Stir in the drained tuna and sweetcorn and warm through for 2 minutes.','Toss the fusilli through the sauce with a squeeze of lemon.','Season to taste and serve.'],
+    'Chorizo and chickpea pasta':['Cook the pasta for 10 minutes and drain.','Fry the sliced chorizo for 3 minutes until its oil releases and the edges crisp.','Add the garlic and drained chickpeas and cook for 2 minutes.','Pour in the chopped tomatoes and simmer for 5 minutes, then wilt in the spinach.','Toss the pasta through the sauce and serve.'],
+    'Lemon chicken orzo with feta':['Cook the orzo for 10 minutes, then drain.','Fry the chicken thighs for 8 minutes until golden and cooked through, then slice.','Add the garlic and spinach to the pan and wilt for 1 minute.','Stir in the orzo with the lemon zest and juice.','Crumble over the feta and serve with the sliced chicken.'],
+    'Turkey bolognese spaghetti':['Brown the turkey mince for 6 minutes, breaking it up as it cooks.','Add the chopped onion and garlic and cook for 4 minutes until softened.','Stir in the tomato purée and cook for 1 minute.','Pour in the chopped tomatoes and simmer for 10 minutes.','Meanwhile cook the spaghetti for 10 minutes, drain and toss through the sauce.'],
+    'Chicken and bacon alfredo':['Cook the fettuccine for 10 minutes, keeping a cup of the cooking water.','Fry the chicken and bacon for 8 minutes until golden and cooked through.','Add the garlic for 1 minute, then pour in the double cream and simmer for 2 minutes.','Stir in most of the parmesan until smooth.','Toss the fettuccine through the sauce, loosening with a splash of water, and top with the last of the parmesan.'],
+    'Cajun prawn penne':['Cook the penne for 10 minutes and drain.','Fry the prawns with the Cajun seasoning for 2 minutes until pink.','Add the sliced red pepper and spring onions for 3 minutes.','Pour in the double cream and simmer for 2 minutes.','Toss the penne through the creamy prawns and serve.'],
+    'Smoked salmon and lemon linguine':['Cook the linguine for 9 minutes and drain, keeping a splash of the water.','Warm the crème fraîche with the lemon zest and juice over a low heat.','Tear the smoked salmon into strips and stir into the sauce for 30 seconds.','Toss the linguine through the sauce with the cooking water to loosen.','Scatter over the dill and serve.']
+  },'niceB1');
+}
+function niceB2(){
+  applyNice({
+    'Chicken Caesar penne':['Cook the penne for 10 minutes, then drain.','Slice the chicken breast and fry for 6 minutes until golden and cooked through.','Tear the romaine lettuce into pieces and add it to the pan for 1 minute, just to wilt.','Toss the penne through the chicken and lettuce with the Caesar dressing.','Finish with grated parmesan and black pepper.'],
+    'Prawn and pesto penne':['Cook the penne for 10 minutes and drain, keeping a splash of the water.','Fry the prawns for 2 minutes each side until pink.','Halve the cherry tomatoes and add them to the pan with the spinach for 2 minutes.','Stir in the pesto and a splash of the cooking water.','Toss the penne through and serve.'],
+    'Beef chilli macaroni':['Cook the macaroni for 8 minutes and drain.','Brown the beef mince with the chopped onion for 6 minutes.','Stir in the chilli powder for 1 minute, then add the chopped tomatoes and drained kidney beans.','Simmer for 8 minutes until thick and rich.','Toss the macaroni through the chilli and scatter over the cheddar to melt.'],
+    'Garlic mushroom and steak gnocchi':['Cook the gnocchi in boiling salted water for 3 minutes, until they float, then drain.','Season the steak and fry for 2 to 3 minutes each side for medium. Rest for 3 minutes, then slice.','In the same pan, fry the sliced mushrooms in the butter for 5 minutes until golden.','Add the crushed garlic and cook for 1 minute.','Toss the gnocchi through the mushrooms, then top with the steak and chopped parsley.'],
+    'Sausage and bean penne':['Cook the penne for 10 minutes and drain.','Fry the chopped onion with the sausage meat, squeezed from the skins, for 6 minutes.','Stir in the chopped tomatoes, baked beans and mixed herbs and simmer for 6 minutes.','Toss the penne through the sauce and serve.'],
+    'Chicken and sun-dried tomato gnocchi':['Cook the gnocchi in boiling salted water for 3 minutes, until they float, then drain.','Fry the chicken chunks for 6 minutes until golden and cooked through.','Add the sliced sun-dried tomatoes and spinach and let the spinach wilt.','Pour in the double cream and simmer for 2 minutes.','Toss the gnocchi through the sauce and finish with grated parmesan.'],
+    'Beef bolognese with penne':['Brown the beef mince for 6 minutes, breaking it up as it cooks.','Add the chopped onion and garlic and cook for 4 minutes.','Pour in the passata and simmer for 10 minutes until rich and thick.','Cook the penne for 10 minutes and drain.','Toss the penne through the bolognese and top with parmesan.'],
+    'Chicken and mushroom tagliatelle':['Cook the tagliatelle for 10 minutes, keeping a splash of the water.','Fry the chicken breast in strips for 6 minutes until golden.','Add the sliced mushrooms and garlic and cook for 5 minutes until the mushrooms are soft and browned.','Stir in the double cream and simmer for 2 minutes.','Toss the tagliatelle through the sauce, top with parmesan and serve.'],
+    'Chicken, chorizo and sun-dried tomato fusilli':['Cook the fusilli for 10 minutes and drain.','Fry the chicken pieces with the sliced chorizo for 6 minutes until cooked through and the chorizo oil is released.','Add the sun-dried tomatoes and spinach and wilt for 1 minute.','Pour in the double cream and simmer for 2 minutes.','Toss the fusilli through the sauce and serve.'],
+    'Beef stroganoff tagliatelle':['Cook the tagliatelle for 10 minutes and drain.','Fry the beef strips in a hot pan for 2 minutes until browned, then set aside.','Fry the sliced mushrooms and onion for 6 minutes until golden.','Stir in the mustard and crumbled stock cube, then add the soured cream and warm gently.','Return the beef to the pan, toss through the tagliatelle and serve.']
+  },'niceB2');
+}
+function niceB3(){
+  if(!S.noGreen){ S.recipes=(S.recipes||[]).filter(r=>!(r.ingredients||[]).some(i=>/green curry/i.test(i.name||''))); S.noGreen=true; }
+  applyNice({
+    'Chicken fried rice':['Cook the basmati rice for 12 minutes, then spread it out to cool slightly.','Cut the chicken into small pieces and fry in a hot pan for 6 minutes until cooked through.','Push the chicken to one side, scramble the eggs for 1 minute, then mix everything together.','Add the peas and rice and fry for 3 minutes, stirring often.','Splash in the soy sauce, toss well and scatter over the sliced spring onions.'],
+    'Beef and broccoli rice stir-fry':['Cook the basmati rice for 12 minutes.','Toss the beef strips with the cornflour and fry in a hot pan for 3 minutes until browned, then set aside.','Add the broccoli with a splash of water and cook for 3 minutes until bright green and tender.','Add the garlic, oyster sauce and soy sauce and cook for 1 minute, then return the beef.','Serve the stir-fry over the rice.'],
+    'Sweet chilli salmon with rice':['Cook the basmati rice for 12 minutes.','Brush the salmon fillets with most of the sweet chilli sauce, keeping a little back.','Air-fry at 200C for 8 minutes until just cooked through.','Slice the spring onions and cut the lime into wedges.','Serve the salmon on the rice with the spare sauce, spring onions and a squeeze of lime.'],
+    'Chorizo and prawn rice':['Slice the chorizo and red pepper.','Fry the chorizo for 3 minutes until its oil releases and the edges crisp.','Add the pepper and smoked paprika and cook for 2 minutes.','Stir in the paella rice and pour over 600 ml stock made from the cube, then simmer covered for 12 minutes.','Scatter the prawns and peas over the top, cover and cook for 4 minutes until the prawns are pink.'],
+    'Jerk chicken and black bean rice':['Cook the basmati rice for 12 minutes.','Rub the chicken thighs with the jerk seasoning and air-fry at 200C for 15 minutes, turning halfway, until cooked through.','Warm the black beans in a pan for 3 minutes.','Slice the chicken and serve on the rice with the beans.','Finish with a squeeze of lime.'],
+    'Beef burrito bowls':['Cook the rice for 12 minutes.','Brown the beef mince for 6 minutes, breaking it up as it cooks.','Stir in the taco seasoning with a splash of water and simmer for 2 minutes.','Add the kidney beans and sweetcorn and warm through for 3 minutes.','Spoon the rice into bowls, then top with the beef mix, salsa and grated cheddar.'],
+    'Korean chicken rice bowls':['Cook the rice for 12 minutes.','Mix the gochujang, soy sauce and honey with 2 tablespoons of water to make a glaze.','Fry the chicken thighs, cut into chunks, for 8 minutes until golden.','Pour in the glaze and cook for 2 minutes until sticky.','Slice the cucumber and spring onions, then spoon the rice into bowls and top with the chicken and vegetables.'],
+    'Greek lemon chicken and rice':['Cook the rice for 12 minutes.','Slice the chicken breast, squeeze over the lemon and sprinkle with the oregano.','Fry the chicken for 8 minutes until golden and cooked through.','Dice the cucumber and tomatoes and crumble the feta.','Serve the chicken on the rice with the salad and feta.'],
+    'Sweet and sour pork rice':['Cook the rice for 12 minutes.','Cut the pork loin into bite-sized pieces and toss in the cornflour.','Fry the pork for 6 minutes until golden and cooked through, then set aside.','Fry the peppers for 3 minutes, then add the pineapple and sweet and sour sauce and simmer for 2 minutes.','Return the pork to the pan, toss to coat and serve on the rice.'],
+    'Cajun salmon and rice':['Cook the rice for 12 minutes.','Rub the salmon fillets with the Cajun seasoning.','Air-fry at 200C for 8 minutes until just cooked through.','Thinly slice the red onion and cut the lime into wedges.','Serve the salmon on the rice with the red onion and lime.'],
+    'Chicken biryani-style rice':['Rinse the basmati rice and cook it in a separate pan for 12 minutes.','Fry the chopped onion in a little oil for 5 minutes until golden.','Add the chicken chunks and biryani paste and cook for 6 minutes.','Stir in the natural yoghurt and simmer for 2 minutes.','Fold in the rice and peas, cover and cook gently for 5 minutes.'],
+    'Turkey and sweetcorn chilli rice':['Cook the rice for 12 minutes.','Brown the turkey mince for 6 minutes, breaking it up as it cooks.','Stir in the chilli powder for 1 minute, then add the chopped tomatoes and kidney beans.','Add the sweetcorn and simmer for 8 minutes until thick.','Spoon the rice into bowls and top with the chilli.'],
+    'Sausage and pea rice pilaf':['Cook the sausages in a pan for 10 minutes, turning, until cooked through, then slice.','Fry the chopped onion in the same pan for 4 minutes.','Stir in the basmati rice and mixed herbs, then pour over 550 ml stock made from the cube.','Cover and simmer for 12 minutes until the rice is tender.','Stir in the peas and sausage for 2 minutes.'],
+    'Chicken and chorizo rice':['Cut the chicken into chunks and slice the chorizo and peppers.','Fry the chicken and chorizo with the smoked paprika for 6 minutes.','Add the peppers and cook for 2 minutes.','Stir in the rice and pour over 600 ml stock made from the cube.','Cover and simmer for 12 minutes until the rice is tender.'],
+    'Chicken and mushroom risotto':['Cut the chicken into chunks and fry in the butter for 6 minutes until golden, then set aside.','Fry the sliced mushrooms and chopped onion for 5 minutes.','Stir in the arborio rice for 1 minute, then add a ladle of stock and stir until absorbed.','Keep adding stock a ladle at a time for 15 minutes until the rice is creamy.','Stir the chicken back in with the parmesan and serve.'],
+    'Lemon and pea rice with cod':['Cook the basmati rice for 12 minutes, adding the peas for the last 2 minutes.','Rub the cod fillets with the butter and a squeeze of lemon.','Air-fry the cod at 200C for 10 minutes until flaky.','Stir the lemon zest and chopped dill into the rice.','Serve the cod on the lemony rice.'],
+    'Lamb rice bowls with cucumber yoghurt':['Cook the rice for 12 minutes.','Season the lamb mince with the cumin and a pinch of salt, then fry for 6 minutes until browned.','Stir the chopped cucumber and mint into the yoghurt.','Spoon the rice into bowls and top with the lamb.','Add a generous spoonful of cucumber yoghurt on top.'],
+    'Chicken and pepper rice':['Cook the rice for 12 minutes.','Slice the chicken thighs and fry for 6 minutes until golden.','Add the sliced peppers and smoked paprika and cook for 4 minutes.','Stir in the stock cube dissolved in 150 ml water and simmer for 2 minutes.','Serve the chicken and peppers over the rice.']
+  },'niceB3');
+}
+function niceB4(){
+  applyNice({
+    'Thai red chicken rice':['Cook the rice for 12 minutes.','Slice the chicken breast and fry for 4 minutes until golden.','Stir in the red curry paste for 1 minute until fragrant.','Pour in the coconut milk and simmer for 6 minutes until the chicken is cooked through.','Wilt the spinach in for 1 minute, add a squeeze of lime, and serve over the rice.'],
+    'Sausage and egg fried rice':['Cook the rice for 12 minutes and spread it out to cool slightly.','Squeeze the sausage meat from the skins and fry in a hot pan for 6 minutes, breaking it up.','Push the sausage to one side, scramble the eggs for 1 minute, then mix everything together.','Add the peas and rice and fry for 3 minutes.','Splash in the soy sauce, toss well and serve.'],
+    'Lemon garlic prawn bowls':['Cook the rice for 12 minutes.','Melt the butter in a pan and fry the crushed garlic for 1 minute.','Add the prawns and cook for 2 minutes each side until pink.','Stir in the spinach until wilted and squeeze over the lemon.','Spoon the rice into bowls and top with the prawns and buttery juices.'],
+    'Lemon and garlic chicken with rice':['Cook the basmati rice for 12 minutes.','Slice the chicken breast and fry in the olive oil with the crushed garlic for 8 minutes until golden and cooked through.','Squeeze in the lemon juice and let it bubble for 1 minute.','Wilt the spinach into the pan.','Serve the chicken and spinach over the rice, spooning the lemony juices on top.'],
+    'Chicken katsu bites with rice':['Cook the basmati rice for 12 minutes.','Cut the chicken into bite-sized pieces and dip each one in flour, then beaten egg, then panko breadcrumbs.','Air-fry at 200C for 10 minutes, shaking halfway, until golden and crisp.','Warm the katsu sauce in a small pan for 1 minute.','Serve the katsu bites on the rice with the sauce spooned over.'],
+    'Chicken parm bites with wedges':['Cut the potatoes into wedges and air-fry at 200C for 15 minutes, shaking halfway.','Cut the chicken into bite-sized pieces and dip in beaten egg, then panko breadcrumbs.','Add the chicken to the basket for the last 10 minutes until cooked through and golden.','Warm the passata in a pan for 2 minutes, then spoon over the chicken.','Top with the mozzarella and air-fry for 1 minute to melt, then serve with the wedges.'],
+    'Chicken and potato curry':['Cut the potatoes into small chunks and boil for 10 minutes until nearly tender.','Fry the chopped onion for 5 minutes until soft.','Add the mild curry paste and cook for 1 minute, then add the chicken chunks and cook for 5 minutes.','Pour in the coconut milk, add the potatoes and simmer for 8 minutes.','Stir in the spinach until wilted and serve.'],
+    'Chicken and garlic crispy potatoes':['Halve the baby potatoes and toss with the olive oil, garlic powder and paprika.','Air-fry the potatoes at 200C for 12 minutes, shaking halfway.','Add the chicken thighs to the basket and air-fry for 12 minutes until golden and cooked through.','Rest the chicken for 2 minutes, then slice.','Serve the chicken with the crispy potatoes.'],
+    'Chicken katsu wedges':['Cut the potatoes into wedges and air-fry at 200C for 15 minutes.','Dip the chicken breast strips in beaten egg, then panko breadcrumbs.','Add the chicken to the basket for the last 12 minutes until golden.','Warm the katsu sauce for 1 minute.','Serve the katsu chicken with the wedges and the sauce on the side.'],
+    'Crispy cod and chips (air fryer)':['Cut the potatoes into thick chips, toss in a little oil and air-fry at 200C for 15 minutes.','Dip the cod fillets in flour, beaten egg, then breadcrumbs.','Add the cod to the basket and air-fry for 10 minutes until crisp and flaky.','Serve the cod with the chips and a generous spoonful of tartare sauce.'],
+    'Sausage and pepper hash':['Cut the potatoes into small cubes and boil for 6 minutes until just tender, then drain.','Fry the sausages for 8 minutes, turning, until cooked through, then slice.','Add the potatoes, onion, peppers and smoked paprika to the pan and fry for 10 minutes until golden.','Make four gaps in the hash and crack in the eggs.','Cover and cook for 3 minutes until the whites are set.']
+  },'niceB4');
+}
+function niceB5(){
+  applyNice({
+    'Bacon and potato hash with eggs':['Cut the potatoes into small cubes and boil for 6 minutes until just tender, then drain.','Fry the bacon in a hot pan for 5 minutes until crisp, then remove it.','Fry the potatoes and sliced onion in the bacon fat for 10 minutes until golden.','Make six gaps in the hash and crack in the eggs.','Cover and cook for 4 minutes until the whites are set, then scatter over the bacon and cheddar.'],
+    'Steak and chips (air fryer)':['Cut the potatoes into chips, toss in the rapeseed oil and air-fry at 200C for 15 minutes, shaking halfway.','Bring the steaks to room temperature and season well with salt and pepper.','Add the steaks to the basket for 8 minutes, turning halfway, for medium.','Rest the steaks for 3 minutes.','Serve with the chips and a spoonful of garlic butter melting over the top.'],
+    'Pork schnitzel with mash':['Peel and chop the potatoes, then boil for 15 minutes until soft.','Bash the pork loin steaks thin between sheets of cling film.','Dip each one in flour, then beaten egg, then panko breadcrumbs.','Fry the schnitzels for 3 minutes each side until golden and cooked through.','Mash the potatoes with the butter and milk and serve with the schnitzel.'],
+    'Chilli stuffed jacket potatoes':['Prick the jacket potatoes and air-fry at 200C for 20 minutes until soft inside.','Brown the beef mince for 6 minutes in a pan.','Stir in the chilli powder, chopped tomatoes and kidney beans and simmer for 8 minutes.','Split the potatoes open and fluff up the insides.','Spoon the chilli over and top with grated cheddar.'],
+    'Honey mustard salmon with new potatoes':['Halve the baby potatoes and air-fry at 200C for 10 minutes, shaking halfway.','Mix the mustard, honey and olive oil in a small bowl.','Brush the salmon with the mixture and add to the basket for 8 minutes until just cooked.','Serve the salmon with the potatoes and drizzle over the remaining glaze.'],
+    'Chicken chorizo potato hash':['Cut the potatoes into small cubes and boil for 6 minutes until just tender, then drain.','Fry the chicken thighs and sliced chorizo for 8 minutes until cooked through and golden.','Add the potatoes and sliced onion and fry for 8 minutes until crisp.','Stir in the diced peppers and cook for 3 minutes.','Serve in bowls, straight from the pan.'],
+    'Beef meatballs and mash':['Peel and chop the potatoes and boil for 15 minutes until soft.','Mix the beef mince with the breadcrumbs and egg, then roll into meatballs.','Fry the meatballs for 8 minutes, turning, until browned and cooked through.','Crumble the stock cube into 300 ml hot water, pour over the meatballs and simmer for 3 minutes.','Mash the potatoes with the butter and serve with the meatballs and sauce.'],
+    'Sausage and red onion air-fried potatoes':['Cut the potatoes into chunks and toss with the oil and mustard.','Air-fry at 200C for 12 minutes, shaking halfway.','Add the sausages and sliced red onion to the basket and air-fry for 10 minutes, turning, until cooked through.','Serve the sausages and onions with the crispy potatoes.'],
+    'Prawn and potato tortilla':['Slice the potatoes thinly and boil for 6 minutes until just tender, then drain.','Fry the prawns with the crushed garlic for 2 minutes until pink, then set aside.','Beat the eggs with the chopped parsley and seasoning, then pour into a pan over the potatoes.','Scatter the prawns over and cook gently for 6 minutes until set underneath.','Flip with a plate and cook for 2 minutes more until golden on both sides.'],
+    'Chicken and bacon potato cakes':['Grate the potatoes and squeeze out as much water as you can.','Mix with the chicken mince, chopped bacon, egg and flour and season well.','Shape into 8 patties.','Fry the patties for 4 minutes each side until golden and cooked through.'],
+    'Turkey burgers with fries (air fryer)':['Cut the potatoes into fries, toss with a little oil and air-fry at 200C for 15 minutes, shaking halfway.','Mix the turkey mince with the burger seasoning and shape into 4 patties.','Add the patties to the basket for the last 12 minutes, turning halfway, until cooked through.','Top each burger with a slice of cheese for the last minute to melt.','Serve the burgers with the fries.'],
+    'Sausage, egg and bean fry-up':['Cook the sausages in a pan for 10 minutes, turning, until cooked through.','Fry the bacon in the same pan for 4 minutes until crisp.','Cut the potatoes into small cubes, boil for 6 minutes until tender, then fry for 6 minutes until golden.','Warm the baked beans in a small pan for 3 minutes.','Fry the eggs and serve everything together.'],
+    'Steak and mushroom mash':['Peel and chop the potatoes and boil for 15 minutes until soft.','Season the steaks and fry for 2 to 3 minutes each side for medium. Rest for 3 minutes, then slice.','Fry the sliced mushrooms in the pan for 5 minutes until golden.','Pour the crumbled stock cube dissolved in 150 ml water over the mushrooms and simmer for 2 minutes.','Mash the potatoes with the butter and milk and serve with the steak and mushroom gravy.'],
+    'Salmon fish cakes (air fryer)':['Pan-fry the salmon fillets for 3 minutes each side until just cooked, then flake.','Boil the potatoes for 12 minutes until soft, then mash with the lemon zest and dill.','Fold the flaked salmon into the mash with the egg and seasoning.','Shape into 4 cakes and coat in breadcrumbs.','Air-fry at 200C for 12 minutes, turning halfway, until golden and crisp. Serve with lemon wedges.']
+  },'niceB5');
+}
+function snapW0(){
+  if(S.w0Snap) return;
+  const isActive=!S.weekKey||S.weekKey==='this'||S.weekKey==='w0';
+  const wp=isActive?(S.plan||{}):((S.weekPlans||{}).w0||(S.weekPlans||{}).this||{});
+  const recs=[];
+  Object.values(wp).forEach(p=>{ const r=p&&(S.recipes||[]).find(x=>x.id===p.recipeId); if(r) recs.push(JSON.parse(JSON.stringify(r))); });
+  S.w0Snap={plan:JSON.parse(JSON.stringify(wp)),recs};
+}
+function restoreW0(){
+  if(S.w0Restored) return;
+  S.w0Restored=true;
+  const sn=S.w0Snap; if(!sn) return;
+  S.recipes=S.recipes||[];
+  sn.recs.forEach(r=>{ if(!S.recipes.some(x=>x.id===r.id)) S.recipes.push(r); });
+  const isActive=!S.weekKey||S.weekKey==='this'||S.weekKey==='w0';
+  if(isActive) S.plan=JSON.parse(JSON.stringify(sn.plan)); else { S.weekPlans=S.weekPlans||{}; S.weekPlans.w0=JSON.parse(JSON.stringify(sn.plan)); }
+}
+function applyRename(map,flag){
+  if(S[flag]) return;
+  (S.recipes||[]).forEach(r=>{ const n=map[r.name]; if(n&&!FIXED_NAMES.includes(r.name)) r.name=n; });
+  S[flag]=true;
+}
+function renameNice(){
+  applyRename({
+    'Sausage and spinach orecchiette':'Sausage and wilted spinach orecchiette',
+    'Bacon, pea and cream fusilli':'Smoky bacon and pea fusilli with parmesan',
+    'Garlic chilli prawn linguine':'Garlic and chilli king prawn linguine',
+    'Quick beef ragu tagliatelle':'Weeknight beef ragu tagliatelle',
+    'Smoked salmon and dill linguine':'Creamy smoked salmon and dill linguine',
+    'Cajun chicken penne':'Cajun chicken penne in a creamy pepper sauce',
+    'Pepperoni and mozzarella rigatoni':'Crispy pepperoni rigatoni with melted mozzarella',
+    'Chicken tikka penne':'Chicken tikka penne with wilted spinach',
+    'Cheeseburger macaroni':'Cheeseburger mac and cheese',
+    'Tuna and sweetcorn fusilli':'Tuna and sweetcorn fusilli in a tomato sauce',
+    'Chorizo and chickpea pasta':'Smoky chorizo and chickpea pasta',
+    'Lemon chicken orzo with feta':'Lemon chicken orzo with crumbled feta',
+    'Turkey bolognese spaghetti':'Rich turkey bolognese spaghetti',
+    'Chicken and bacon alfredo':'Chicken and bacon fettuccine alfredo',
+    'Cajun prawn penne':'Cajun prawn penne in a creamy sauce',
+    'Smoked salmon and lemon linguine':'Lemon and smoked salmon linguine',
+    'Chicken, chorizo and sun-dried tomato fusilli':'Chicken, chorizo and sun-dried tomato fusilli',
+    'Beef stroganoff tagliatelle':'Beef stroganoff tagliatelle with mushrooms',
+    'Chicken Caesar penne':'Chicken Caesar penne with parmesan',
+    'Prawn and pesto penne':'King prawn and basil pesto penne',
+    'Beef chilli macaroni':'Beef chilli mac',
+    'Garlic mushroom and steak gnocchi':'Pan-fried steak and garlic mushroom gnocchi',
+    'Sausage and bean penne':'Sausage and baked bean penne',
+    'Chicken and sun-dried tomato gnocchi':'Creamy chicken and sun-dried tomato gnocchi',
+    'Beef bolognese with penne':'Classic beef bolognese penne',
+    'Chicken and mushroom tagliatelle':'Creamy chicken and mushroom tagliatelle',
+    'Chicken fried rice':'Egg fried chicken and pea rice',
+    'Chicken katsu bites with rice':'Crispy chicken katsu bites with rice',
+    'Beef and broccoli rice stir-fry':'Beef and broccoli stir-fry with rice',
+    'Sweet chilli salmon with rice':'Sticky sweet chilli salmon with rice',
+    'Chorizo and prawn rice':'Smoky chorizo and prawn paella-style rice',
+    'Jerk chicken and black bean rice':'Jerk chicken with black bean rice',
+    'Beef burrito bowls':'Beef burrito bowls with salsa and cheddar',
+    'Korean chicken rice bowls':'Gochujang chicken rice bowls',
+    'Greek lemon chicken and rice':'Greek lemon chicken with herby rice',
+    'Sweet and sour pork rice':'Sweet and sour pork with pineapple',
+    'Cajun salmon and rice':'Cajun-spiced salmon with zesty rice',
+    'Chicken biryani-style rice':'Chicken biryani-style rice with yoghurt',
+    'Turkey and sweetcorn chilli rice':'Turkey and sweetcorn chilli with rice',
+    'Sausage and pea rice pilaf':'Sausage and pea pilaf',
+    'Chicken and chorizo rice':'Chicken and chorizo one-pan rice',
+    'Chicken and mushroom risotto':'Creamy chicken and mushroom risotto',
+    'Lemon and pea rice with cod':'Lemon and pea rice with crispy cod',
+    'Lamb rice bowls with cucumber yoghurt':'Spiced lamb rice bowls with cucumber yoghurt',
+    'Chicken and pepper rice':'Smoky chicken and pepper rice',
+    'Thai red chicken rice':'Thai red chicken curry with rice',
+    'Lemon garlic prawn bowls':'Lemon garlic prawn rice bowls',
+    'Lemon and garlic chicken with rice':'Lemon and garlic chicken with spinach rice',
+    'Chicken parm bites with wedges':'Chicken parmigiana bites with wedges',
+    'Chicken and potato curry':'Chicken and potato coconut curry',
+    'Chicken and garlic crispy potatoes':'Garlic crispy chicken thighs and potatoes',
+    'Chicken katsu wedges':'Crispy chicken katsu with wedges',
+    'Crispy cod and chips (air fryer)':'Crispy cod and chips',
+    'Sausage and pepper hash':'Sausage and pepper potato hash with fried eggs',
+    'Bacon and potato hash with eggs':'Bacon and potato hash with fried eggs',
+    'Steak and chips (air fryer)':'Steak and chips with garlic butter',
+    'Pork schnitzel with mash':'Crispy pork schnitzel with buttery mash',
+    'Chilli stuffed jacket potatoes':'Chilli-stuffed jacket potatoes',
+    'Chicken chorizo potato hash':'Chicken and chorizo potato hash',
+    'Beef meatballs and mash':'Beef meatballs in gravy with mash',
+    'Sausage and red onion air-fried potatoes':'Air-fried sausages with red onion and potatoes',
+    'Prawn and potato tortilla':'King prawn and potato tortilla',
+    'Turkey burgers with fries (air fryer)':'Turkey burgers with crispy fries',
+    'Steak and mushroom mash':'Steak and mushroom gravy with mash',
+    'Salmon fish cakes (air fryer)':'Salmon fishcakes with lemon',
+    'Chicken brioche burgers':'Chicken brioche burgers with slaw',
+    'Steak and pepper fajita wraps':'Steak fajita wraps with soured cream',
+    'Prawn and avocado tacos':'King prawn and avocado tacos',
+    'Chicken schnitzel burgers':'Chicken schnitzel burgers with coleslaw',
+    'Chicken quesadillas':'Chicken quesadillas with salsa'
+  },'renameNice');
+}
+function renameHash(){
+  applyRename({
+    'Sausage and pepper potato hash with fried eggs':'Sausage and pepper potatoes with fried eggs',
+    'Bacon and potato hash with fried eggs':'Crispy bacon potatoes with fried eggs',
+    'Chicken and chorizo potato hash':'Chicken and chorizo crispy potatoes'
+  },'renameHash');
+}
+function removeHash(){
+  if(S.hashGone) return;
+  const isActive=!S.weekKey||S.weekKey==='this'||S.weekKey==='w0';
+  const w0p=isActive?(S.plan||{}):((S.weekPlans||{}).w0||{});
+  const keep=new Set(Object.values(w0p).map(p=>p&&p.recipeId));
+  const names=['Sausage and pepper potatoes with fried eggs','Crispy bacon potatoes with fried eggs','Chicken and chorizo crispy potatoes'];
+  const bad=new Set((S.recipes||[]).filter(r=>names.includes(r.name)&&!keep.has(r.id)).map(r=>r.id));
+  S.recipes=(S.recipes||[]).filter(r=>!bad.has(r.id));
+  const clean=pl=>{ Object.keys(pl||{}).forEach(d=>{ if(pl[d]&&bad.has(pl[d].recipeId)&&d!=='Fri'&&d!=='Sat') delete pl[d]; }); };
+  if(!isActive) clean(S.plan);
+  Object.keys(S.weekPlans||{}).forEach(k=>{ if(k!=='w0'&&k!=='this') clean(S.weekPlans[k]); });
+  S.hashGone=true;
+}
+function removeLemon(){
+  if(S.lemonGone) return;
+  const isActive=!S.weekKey||S.weekKey==='this'||S.weekKey==='w0';
+  const w0p=isActive?(S.plan||{}):((S.weekPlans||{}).w0||{});
+  const keep=new Set(Object.values(w0p).map(p=>p&&p.recipeId));
+  const bad=new Set((S.recipes||[]).filter(r=>/lemon/i.test(r.name||'')&&!keep.has(r.id)).map(r=>r.id));
+  S.recipes=(S.recipes||[]).filter(r=>!bad.has(r.id));
+  const clean=pl=>{ Object.keys(pl||{}).forEach(d=>{ if(pl[d]&&bad.has(pl[d].recipeId)&&d!=='Fri'&&d!=='Sat') delete pl[d]; }); };
+  if(!isActive) clean(S.plan);
+  Object.keys(S.weekPlans||{}).forEach(k=>{ if(k!=='w0'&&k!=='this') clean(S.weekPlans[k]); });
+  S.lemonGone=true;
+}
 function fixPop(){
   if(S.popFixed) return;
   const s=(S.stock||[]).find(x=>normN(x.name)==="pop");
@@ -437,6 +660,7 @@ function fixWeekly3(){
   S.weeklyFixed3=true;
 }
 function seedPantry(){
+  snapW0();
   seedBatch2();
   seedBatch3();
   seedBatch4();
@@ -461,6 +685,18 @@ function seedPantry(){
   fixVariety2();
   fixNoCouscous();
   fixNoReady();
+  fixNoVeg();
+  niceB1();
+  niceB2();
+  niceB3();
+  niceB4();
+  niceB5();
+  fixNoPak();
+  renameNice();
+  renameHash();
+  removeHash();
+  removeLemon();
+  restoreW0();
   purgeSideSalad();
   fixLambMince();
   if(S.pantrySeeded) return;
@@ -1073,6 +1309,35 @@ METHODS["Lemon and garlic chicken with rice"]=["Rinse the rice and cook it for 1
 /*MORE*/
 const FIXED_NAMES=["Chicken nuggets and chips","Pizza night"];
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function isSandwich(r){
+  return /toastie|melt|sandwich|baguette|ciabatta|panini|subs|rolls|pitta|sausage roll|french dip|breakfast roll/i.test(r.name||'');
+}
+function fixNoPak(){
+  if(S.noPak) return;
+  const bad=new Set((S.recipes||[]).filter(r=>(r.ingredients||[]).some(i=>/pak choi/i.test(i.name||''))).map(r=>r.id));
+  S.recipes=(S.recipes||[]).filter(r=>!bad.has(r.id));
+  const clean=pl=>{ Object.keys(pl||{}).forEach(d=>{ if(pl[d]&&bad.has(pl[d].recipeId)&&d!=='Fri'&&d!=='Sat') delete pl[d]; }); };
+  clean(S.plan);
+  Object.values(S.weekPlans||{}).forEach(clean);
+  S.noPak=true;
+}
+const MEAT_RE=/chicken|beef|pork|lamb|sausage|bacon|chorizo|prawn|salmon|\bcod\b|fish|tuna|mince|steak|pancetta|lardon|salami|pepperoni|anchov|haddock|pollock|sea bass|mackerel|kofta|turkey|duck|gammon|meatball|hake|trout|squid|mussel|scallop|crab|lobster/i;
+function isMeatFish(r){
+  return (r.ingredients||[]).some(i=>{ const n=i.name||''; return MEAT_RE.test(n)&&!/stock|sauce|paste|seasoning|cube|relish/i.test(n); });
+}
+function isExcluded(r){
+  if(FIXED_NAMES.includes(r.name)) return false;
+  return /lentil/i.test(r.name||'')||(r.ingredients||[]).some(i=>/lentil/i.test(i.name||''))||!isMeatFish(r);
+}
+function fixNoVeg(){
+  if(S.noVeg) return;
+  const bad=new Set((S.recipes||[]).filter(isExcluded).map(r=>r.id));
+  S.recipes=(S.recipes||[]).filter(r=>!bad.has(r.id));
+  const clean=pl=>{ Object.keys(pl||{}).forEach(d=>{ if(pl[d]&&bad.has(pl[d].recipeId)&&d!=='Fri'&&d!=='Sat') delete pl[d]; }); };
+  clean(S.plan);
+  Object.values(S.weekPlans||{}).forEach(clean);
+  S.noVeg=true;
+}
 function isReadyMeal(r){
   return (r.ingredients||[]).some(i=>/ready|nugget|fish finger|spring roll|samosa|dumpling|sausage roll|frozen chips/i.test(i.name||''))||/nugget|ready/i.test(r.name||'');
 }
@@ -1098,7 +1363,7 @@ function generateWeek(){
     ...Object.values(S.plan||{}).map(p=>p&&p.recipeId),
     ...Object.values(S.weekPlans||{}).flatMap(pl=>Object.values(pl||{}).map(p=>p&&p.recipeId))
   ].filter(Boolean));
-  const basePool=S.recipes.filter(r=>!used.has(r.id)&&r.carb!=="Bread"&&!FIXED_NAMES.includes(r.name)&&!isReadyMeal(r)&&!(r.ingredients||[]).some(i=>/leek|\bham\b|pak choi/i.test(i.name)));
+  const basePool=S.recipes.filter(r=>!used.has(r.id)&&!(r.carb==="Bread"&&isSandwich(r))&&!FIXED_NAMES.includes(r.name)&&!isReadyMeal(r)&&!isExcluded(r)&&!(r.ingredients||[]).some(i=>/leek|\bham\b|pak choi/i.test(i.name)));
   const freshPool=basePool.filter(r=>!recent.has(r.id));
   const pool=shuffle(freshPool.length>=open.length?freshPool:basePool);
   if(!pool.length){ note("Add some recipes first."); return; }
