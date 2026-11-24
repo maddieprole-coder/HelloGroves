@@ -1221,8 +1221,7 @@ function shopping(PLAN){
   }));
   S.stock.forEach(s=>{
     const lowAt=s.low>0?s.low:(portionFor(s)||s.need||0);
-    const back=s.qty<=lowAt?backFor(s):0;
-    const add=(Number(s.need)||0)+back; if(!add) return;
+    const add=(Number(s.need)||0); if(!add) return;
     const k=norm(s.name)+"|"+norm(s.unit); need[k]=need[k]||{name:s.name,unit:s.unit,qty:0}; need[k].qty+=add;
   });
   return Object.values(need).map(n=>{
